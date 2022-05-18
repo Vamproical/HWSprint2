@@ -13,7 +13,7 @@ public class Main {
         }
         String path = args[0];
 
-        fill();
+        fillPost();
 
         List<String> parsed = read(new File(path));
         List<Employee> employees = new ArrayList<>();
@@ -29,7 +29,7 @@ public class Main {
 
     }
 
-    public static void fill() {
+    public static void fillPost() {
         posts.put(UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707"), "Engineer");
         posts.put(UUID.fromString("762d15a5-3bc9-43ef-ae96-02a680a557d0"), "Tech Writer");
     }
