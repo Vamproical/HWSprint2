@@ -42,7 +42,7 @@ public class Main {
                 parsed.add(scanner.next());
             }
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
         return parsed;
     }
@@ -74,7 +74,6 @@ public class Main {
         if (firstName.isBlank() || lastName.isBlank() || characteristics.isEmpty() || post.isBlank()) {
             throw new NullPointerException("All the fields except description must be not blank");
         }
-        Collections.sort(characteristics);
         return new Employee(firstName, lastName, description, characteristics, post);
     }
 
