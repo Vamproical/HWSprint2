@@ -1,4 +1,4 @@
-package com.ws.hw1;
+package com.ws.hw1.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
