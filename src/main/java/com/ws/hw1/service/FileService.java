@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileService {
-    public List<EmployeeFromFile> read(File file) throws NullPointerException {
+    public List<EmployeeFromFile> read(File file) {
         Gson gson = new Gson();
         List<EmployeeFromFile> parsed = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -23,7 +23,7 @@ public class FileService {
                 parsed.add(gson.fromJson(element, EmployeeFromFile.class));
             }
         } catch (IOException e) {
-            throw new IllegalArgumentException("The file doesn't found");
+            throw new IllegalArgumentException("The file isn't found");
         }
         return parsed;
     }
