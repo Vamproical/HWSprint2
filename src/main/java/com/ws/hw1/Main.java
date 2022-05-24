@@ -1,39 +1,54 @@
 package com.ws.hw1;
 
 import com.ws.hw1.action.AddEmployeesAction;
-import com.ws.hw1.mapper.EmployeeListMapperImpl;
+import com.ws.hw1.mapper.EmployeeMapperImpl;
+import com.ws.hw1.model.ArgsModel;
+import com.ws.hw1.model.SearchParams;
 import com.ws.hw1.service.EmployeeService;
-import com.ws.hw1.service.FileService;
+import com.ws.hw1.service.ParseService;
+import com.ws.hw1.service.PostService;
 
-import java.util.Optional;
+import java.io.File;
+import java.util.UUID;
 
 public class Main {
-    private static String FILE_NAME = "";
-    private static String SEARCH_STRING = null;
+    private static final ArgsModel argsModel = new ArgsModel();
 
     public static void main(String[] args) {
         parseArgs(args);
 
         EmployeeService employeeService = new EmployeeService();
-        AddEmployeesAction addEmployeesAction = new AddEmployeesAction(new FileService(),
+        AddEmployeesAction addEmployeesAction = new AddEmployeesAction(new ParseService(),
+                new PostService(),
                 employeeService,
-                new EmployeeListMapperImpl());
+                new EmployeeMapperImpl());
 
-        addEmployeesAction.addEmployeesFromFile(FILE_NAME);
-        employeeService.getAllOrdered(Optional.ofNullable(SEARCH_STRING)).forEach(System.out::println);
+        addEmployeesAction.addEmployeesFromFile(new File(argsModel.getPath()));
+        employeeService.getAllOrdered(argsModel.getSearchParams()).forEach(System.out::println);
     }
 
     private static void parseArgs(String[] args) {
+
         if (args.length == 0) {
             throw new IllegalArgumentException("File must be the argument of the program");
         }
+
+        SearchParams.SearchParamsBuilder searchParams = SearchParams.builder();
         for (int i = 0; i < args.length; i++) {
+
             if (args[i].equals("-file")) {
-                FILE_NAME = args[i + 1];
+                argsModel.setPath(args[i + 1]);
             }
-            if (args[i].equals("-search")) {
-                SEARCH_STRING = args[i + 1];
+            if (args[i].equals("-searchByFirstName")) {
+                searchParams.firstName(args[i + 1]);
+            }
+            if (args[i].equals("-searchByLastName")) {
+                searchParams.lastName(args[i + 1]);
+            }
+            if (args[i].equals("-searchByPostID")) {
+                searchParams.postID(UUID.fromString(args[i + 1]));
             }
         }
+        argsModel.setSearchParams(searchParams.build());
     }
 }
