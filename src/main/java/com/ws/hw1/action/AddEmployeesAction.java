@@ -10,7 +10,6 @@ import com.ws.hw1.service.PostService;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,8 +31,6 @@ public class AddEmployeesAction {
 
     public void addEmployeesFromFile(File file) {
         List<EmployeeFromFile> parsed = fileService.parseJsonFile(file);
-        parsed.forEach(i -> Collections.sort(i.getCharacteristics()));
-
         List<Post> posts = convert(parsed);
         List<Employee> employees = new ArrayList<>();
         for (int i = 0; i < parsed.size(); i++) {
@@ -44,7 +41,7 @@ public class AddEmployeesAction {
 
     private List<Post> convert(List<EmployeeFromFile> employees) {
         return employees.stream()
-                .map(i -> postService.convert(i.getPostID()))
+                .map(i -> postService.convert(i.getPostId()))
                 .collect(Collectors.toList());
     }
 }

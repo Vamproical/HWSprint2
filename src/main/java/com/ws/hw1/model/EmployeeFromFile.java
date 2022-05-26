@@ -19,5 +19,5 @@ public class EmployeeFromFile {
     @NonNull
     private List<String> characteristics;
     @NonNull
-    private String postID;
+    private String postId;
 }

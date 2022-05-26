@@ -3,7 +3,10 @@ package com.ws.hw1.service;
 import com.ws.hw1.model.Employee;
 import com.ws.hw1.model.SearchParams;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -15,23 +18,19 @@ public class EmployeeService {
     }
 
     public List<Employee> getAllOrdered(SearchParams params) {
-        Predicate<Employee> predicateFirstName = Objects::nonNull;
-        Predicate<Employee> predicateLastName= Objects::nonNull;
+        Predicate<Employee> predicateName = Objects::nonNull;
         Predicate<Employee> predicateUUID = Objects::nonNull;
 
-        if(params.getFirstName() != null){
-            predicateFirstName = employee -> employee.getFirstName().toLowerCase().contains(params.getFirstName().toLowerCase());
+        if (params.getName() != null) {
+            predicateName = employee -> employee.getFirstName().toLowerCase().contains(params.getName().toLowerCase()) ||
+                                        employee.getLastName().toLowerCase().contains(params.getName().toLowerCase());
         }
-        if(params.getLastName() != null){
-            predicateLastName = employee ->  employee.getLastName().toLowerCase().contains(params.getLastName().toLowerCase());
-        }
-        if(params.getPostID() != null){
-            predicateUUID = employee -> employee.getPost().getId().equals(params.getPostID());
+        if (params.getPostId() != null) {
+            predicateUUID = employee -> employee.getPost().getId().equals(params.getPostId());
         }
 
         return employees.stream()
-                .filter(predicateFirstName)
-                .filter(predicateLastName)
+                .filter(predicateName)
                 .filter(predicateUUID)
                 .sorted(Comparator.comparing(Employee::getFirstName)
                         .thenComparing(Employee::getLastName))

@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.UUID;
 
 class EmployeeServiceTest {
-    public static final Employee employee = new Employee(
+    public static final Employee EMPLOYEE = new Employee(
             "Иван",
             "Иванов",
             null,
             List.of("some characteristics"),
             new Post(UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707"), "Tech lead"));
 
-    public static final Employee employee1 = new Employee(
+    public static final Employee EMPLOYEE1 = new Employee(
             "Геннадий",
             "Кузьмин",
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sitamet dictum felis, eu fringilla eros. Sed et gravida neque. Nullam at egestas erat. Mauris vitae convallis nulla. Aenean condimentum lectus magna. Suspendisse viverra quam non ante pellentesque, a euismod nunc dapibus. Duis sed congue erat",
@@ -33,34 +33,38 @@ class EmployeeServiceTest {
 
     @BeforeEach
     private void addEmployees() {
-        employeeService.addEmployees(List.of(employee, employee1));
+        employeeService.addEmployees(List.of(EMPLOYEE, EMPLOYEE1));
     }
 
     @Test
     void getAllOrderedWithoutSearch() {
-        List<Employee> excepted = List.of(employee1, employee);
-        List<Employee> actual = employeeService.getAllOrdered(new SearchParams(UUID.randomUUID(), null, null, null));
+        List<Employee> excepted = List.of(EMPLOYEE1, EMPLOYEE);
+        SearchParams searchParams = new SearchParams(UUID.randomUUID(), null, null);
+        List<Employee> actual = employeeService.getAllOrdered(searchParams);
         Assertions.assertEquals(excepted, actual);
     }
 
     @Test
     void getAllOrderedSearchByFirstName() {
-        List<Employee> excepted = List.of(employee1);
-        List<Employee> actual = employeeService.getAllOrdered(new SearchParams(UUID.randomUUID(), "Геннадий", null, null));
+        List<Employee> excepted = List.of(EMPLOYEE1);
+        SearchParams searchParams = new SearchParams(UUID.randomUUID(), "Геннадий",  null);
+        List<Employee> actual = employeeService.getAllOrdered(searchParams);
         Assertions.assertEquals(excepted, actual);
     }
 
     @Test
     void getAllOrderedSearchByLastName() {
-        List<Employee> excepted = List.of(employee);
-        List<Employee> actual = employeeService.getAllOrdered(new SearchParams(UUID.randomUUID(), null, "Иванов", null));
+        List<Employee> excepted = List.of(EMPLOYEE);
+        SearchParams searchParams = new SearchParams(UUID.randomUUID(),  "Иванов", null);
+        List<Employee> actual = employeeService.getAllOrdered(searchParams);
         Assertions.assertEquals(excepted, actual);
     }
 
     @Test
     void getAllOrderedSearchByPostID() {
-        List<Employee> excepted = List.of(employee);
-        List<Employee> actual = employeeService.getAllOrdered(new SearchParams(UUID.randomUUID(), null, null, UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707")));
+        List<Employee> excepted = List.of(EMPLOYEE);
+        SearchParams searchParams = new SearchParams(UUID.randomUUID(),  null, UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707"));
+        List<Employee> actual = employeeService.getAllOrdered(searchParams);
         Assertions.assertEquals(excepted, actual);
     }
 }

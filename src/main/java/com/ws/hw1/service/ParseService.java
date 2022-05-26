@@ -12,6 +12,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ParseService {
@@ -21,6 +22,7 @@ public class ParseService {
             JsonArray jsonArray = JsonParser.parseReader(br).getAsJsonArray();
             Type listType = new TypeToken<ArrayList<EmployeeFromFile>>(){}.getType();
             parsed = new Gson().fromJson(jsonArray, listType);
+            parsed.forEach(i -> Collections.sort(i.getCharacteristics()));
         } catch (IOException e) {
             throw new IllegalArgumentException("The file isn't found");
         }

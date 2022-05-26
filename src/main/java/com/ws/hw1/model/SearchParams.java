@@ -11,7 +11,6 @@ import java.util.UUID;
 @Builder
 public class SearchParams {
     private UUID id;
-    private String firstName;
-    private String lastName;
-    private UUID postID;
+    private String name;
+    private UUID postId;
 }

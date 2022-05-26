@@ -15,14 +15,14 @@ import java.util.UUID;
 
 class AddEmployeesActionTest {
 
-    public static final Employee employee = new Employee(
+    public static final Employee EMPLOYEE = new Employee(
             "Иван",
             "Иванов",
             null,
             List.of("some characteristics"),
             new Post(UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707"), "Tech lead"));
 
-    public static final Employee employee1 = new Employee(
+    public static final Employee EMPLOYEE1 = new Employee(
             "Геннадий",
             "Кузьмин",
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sitamet dictum felis, eu fringilla eros. Sed et gravida neque. Nullam at egestas erat. Mauris vitae convallis nulla. Aenean condimentum lectus magna. Suspendisse viverra quam non ante pellentesque, a euismod nunc dapibus. Duis sed congue erat",
@@ -36,7 +36,7 @@ class AddEmployeesActionTest {
     @Test
     void addEmployeesFromFile() {
         //Arrange
-        List<Employee> expected = List.of(employee, employee1);
+        List<Employee> expected = List.of(EMPLOYEE, EMPLOYEE1);
         EmployeeService employeeService = new EmployeeService();
         AddEmployeesAction action = new AddEmployeesAction(new ParseService(),
                 new PostService(),

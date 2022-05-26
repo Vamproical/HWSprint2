@@ -12,26 +12,25 @@ import java.io.File;
 import java.util.UUID;
 
 public class Main {
-    private static final ArgsModel argsModel = new ArgsModel();
-
     public static void main(String[] args) {
-        parseArgs(args);
+        ArgsModel argsModel = parseArgs(args);
 
         EmployeeService employeeService = new EmployeeService();
-        AddEmployeesAction addEmployeesAction = new AddEmployeesAction(new ParseService(),
-                new PostService(),
-                employeeService,
-                new EmployeeMapperImpl());
+        AddEmployeesAction addEmployeesAction = new
+                AddEmployeesAction(new ParseService(),
+                                   new PostService(),
+                                   employeeService,
+                                   new EmployeeMapperImpl());
 
         addEmployeesAction.addEmployeesFromFile(new File(argsModel.getPath()));
         employeeService.getAllOrdered(argsModel.getSearchParams()).forEach(System.out::println);
     }
 
-    private static void parseArgs(String[] args) {
-
+    private static ArgsModel parseArgs(String[] args) {
         if (args.length == 0) {
             throw new IllegalArgumentException("File must be the argument of the program");
         }
+        ArgsModel argsModel = new ArgsModel();
 
         SearchParams.SearchParamsBuilder searchParams = SearchParams.builder();
         for (int i = 0; i < args.length; i++) {
@@ -39,16 +38,14 @@ public class Main {
             if (args[i].equals("-file")) {
                 argsModel.setPath(args[i + 1]);
             }
-            if (args[i].equals("-searchByFirstName")) {
-                searchParams.firstName(args[i + 1]);
-            }
-            if (args[i].equals("-searchByLastName")) {
-                searchParams.lastName(args[i + 1]);
+            if (args[i].equals("-searchByName")) {
+                searchParams.name(args[i + 1]);
             }
             if (args[i].equals("-searchByPostID")) {
-                searchParams.postID(UUID.fromString(args[i + 1]));
+                searchParams.postId(UUID.fromString(args[i + 1]));
             }
         }
         argsModel.setSearchParams(searchParams.build());
+        return argsModel;
     }
 }
