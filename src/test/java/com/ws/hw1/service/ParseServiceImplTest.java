@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.List;
 
-class ParseServiceTest {
+class ParseServiceImplTest {
     public static final EmployeeFromFile EMPLOYEE_FROM_FILE = new EmployeeFromFile(
             "Иван",
             "Иванов",
@@ -25,12 +25,12 @@ class ParseServiceTest {
                     "love of Learning",
                     "pragmatism"),
             "762d15a5-3bc9-43ef-ae96-02a680a557d0");
-    private final ParseService parseService = new ParseService();
+    private final ParseServiceImpl parseServiceImpl = new ParseServiceImpl();
 
     @Test
     void read() {
         List<EmployeeFromFile> expected = List.of(EMPLOYEE_FROM_FILE, EMPLOYEE_FROM_FILE1);
-        List<EmployeeFromFile> actual = parseService.parseJsonFile(new File("src/test/resources/employees.json"));
+        List<EmployeeFromFile> actual = parseServiceImpl.parseJsonFile(new File("src/test/resources/employees.json"));
         Assertions.assertEquals(expected, actual);
     }
 

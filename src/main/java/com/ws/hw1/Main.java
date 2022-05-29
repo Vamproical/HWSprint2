@@ -4,8 +4,8 @@ import com.ws.hw1.action.AddEmployeesAction;
 import com.ws.hw1.mapper.EmployeeMapperImpl;
 import com.ws.hw1.model.ArgsModel;
 import com.ws.hw1.model.SearchParams;
-import com.ws.hw1.service.EmployeeService;
-import com.ws.hw1.service.ParseService;
+import com.ws.hw1.service.EmployeeServiceImpl;
+import com.ws.hw1.service.ParseServiceImpl;
 import com.ws.hw1.service.PostService;
 
 import java.io.File;
@@ -15,15 +15,15 @@ public class Main {
     public static void main(String[] args) {
         ArgsModel argsModel = parseArgs(args);
 
-        EmployeeService employeeService = new EmployeeService();
+        EmployeeServiceImpl employeeServiceImpl = new EmployeeServiceImpl();
         AddEmployeesAction addEmployeesAction = new
-                AddEmployeesAction(new ParseService(),
+                AddEmployeesAction(new ParseServiceImpl(),
                                    new PostService(),
-                                   employeeService,
+                employeeServiceImpl,
                                    new EmployeeMapperImpl());
 
         addEmployeesAction.addEmployeesFromFile(new File(argsModel.getPath()));
-        employeeService.getAllOrdered(argsModel.getSearchParams()).forEach(System.out::println);
+        employeeServiceImpl.getAllOrdered(argsModel.getSearchParams()).forEach(System.out::println);
     }
 
     private static ArgsModel parseArgs(String[] args) {
