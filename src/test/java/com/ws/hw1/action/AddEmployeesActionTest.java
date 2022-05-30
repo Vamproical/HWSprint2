@@ -69,7 +69,7 @@ class AddEmployeesActionTest {
                 postService,
                 employeeService,
                 employeeMapper);
-        File file = new File("src/test/resources/employees.json");
+        File file = new File(AddEmployeesActionTest.class.getClassLoader().getResource("employees.json").getFile());
         //Act
         when(parseService.parseJsonFile(file)).thenReturn(parsed);
         when(employeeMapper.toEmployee(EMPLOYEE_FROM_FILE, posts.get(0))).thenReturn(EMPLOYEE);

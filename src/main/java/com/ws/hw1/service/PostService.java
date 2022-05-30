@@ -16,7 +16,7 @@ public class PostService {
                 new Post(UUID.fromString("762d15a5-3bc9-43ef-ae96-02a680a557d0"),"Tech Writer"));
     }
 
-    public Post convert(String postId) {
+    public Post getPost(String postId) {
         return posts.get(UUID.fromString(postId));
     }
 }

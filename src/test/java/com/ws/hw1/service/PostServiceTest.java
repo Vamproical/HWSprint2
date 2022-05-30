@@ -12,14 +12,14 @@ class PostServiceTest {
     @Test
     void convertTest() {
         Post excepted = new Post(UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707"), "Tech lead");
-        Post actual = postService.convert(excepted.getId().toString());
+        Post actual = postService.getPost(excepted.getId().toString());
         Assertions.assertEquals(excepted, actual);
     }
 
     @Test
     void convertTestWithNull() {
         Post excepted = new Post(UUID.randomUUID(), "Tech lead");
-        Post actual = postService.convert(excepted.getId().toString());
+        Post actual = postService.getPost(excepted.getId().toString());
         Assertions.assertNull(actual);
     }
 }
