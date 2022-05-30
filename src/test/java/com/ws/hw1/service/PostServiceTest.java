@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 
 class PostServiceTest {
-    private final PostService postService = new PostService();
+    private final PostService postService = new PostServiceImpl();
 
     @Test
     void convertTest() {

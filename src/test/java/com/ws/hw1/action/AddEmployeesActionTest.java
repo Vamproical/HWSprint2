@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,22 +62,23 @@ class AddEmployeesActionTest {
         List<EmployeeFromFile> parsed = List.of(EMPLOYEE_FROM_FILE, EMPLOYEE_FROM_FILE1);
         EmployeeService employeeService = mock(EmployeeServiceImpl.class);
         ParseService parseService = mock(ParseServiceImpl.class);
-        PostService postService = new PostService();
+        PostService postService = mock(PostService.class);
         EmployeeMapper employeeMapper = mock(EmployeeMapperImpl.class);
         AddEmployeesAction action = new AddEmployeesAction(parseService,
                 postService,
                 employeeService,
                 employeeMapper);
         File file = new File(AddEmployeesActionTest.class.getClassLoader().getResource("employees.json").getFile());
-        //Act
         when(parseService.parseJsonFile(file)).thenReturn(parsed);
-        when(employeeMapper.toEmployee(EMPLOYEE_FROM_FILE, posts.get(0))).thenReturn(EMPLOYEE);
-        when(employeeMapper.toEmployee(EMPLOYEE_FROM_FILE1, posts.get(1))).thenReturn(EMPLOYEE1);
-        doNothing().when(employeeService).addEmployees(expected);
+        when(postService.getPost("854ef89d-6c27-4635-926d-894d76a81707")).thenReturn(posts.get(0));
+        when(postService.getPost("762d15a5-3bc9-43ef-ae96-02a680a557d0")).thenReturn(posts.get(1));
+        when(employeeMapper.toEmployee(any(), any())).thenReturn(EMPLOYEE, EMPLOYEE1);
+        //Act
         action.addEmployeesFromFile(file);
         //Assert
         verify(parseService).parseJsonFile(file);
-        verify(employeeMapper, times(2)).toEmployee(any(), any());
         verify(employeeService).addEmployees(expected);
+        verify(employeeMapper).toEmployee(EMPLOYEE_FROM_FILE, posts.get(0));
+        verify(employeeMapper).toEmployee(EMPLOYEE_FROM_FILE1, posts.get(1));
     }
 }
