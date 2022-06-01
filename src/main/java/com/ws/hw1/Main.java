@@ -1,86 +1,50 @@
 package com.ws.hw1;
 
+import com.ws.hw1.action.AddEmployeesAction;
+import com.ws.hw1.mapper.EmployeeMapper;
+import com.ws.hw1.model.ArgsModel;
+import com.ws.hw1.model.SearchParams;
+import com.ws.hw1.service.*;
+import org.mapstruct.factory.Mappers;
+
 import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import java.util.UUID;
 
 public class Main {
-    private static final Map<UUID, String> posts = new HashMap<>();
-
     public static void main(String[] args) {
-        if (args.length < 1) {
+        ArgsModel argsModel = parseArgs(args);
+
+        EmployeeService employeeServiceImpl = new EmployeeServiceImpl();
+        AddEmployeesAction addEmployeesAction = new
+                AddEmployeesAction(new ParseServiceImpl(),
+                                   new PostServiceImpl(),
+                employeeServiceImpl,
+                Mappers.getMapper(EmployeeMapper.class));
+
+        addEmployeesAction.addEmployeesFromFile(new File(argsModel.getPath()));
+        employeeServiceImpl.getAllOrdered(argsModel.getSearchParams()).forEach(System.out::println);
+    }
+
+    private static ArgsModel parseArgs(String[] args) {
+        if (args.length == 0) {
             throw new IllegalArgumentException("File must be the argument of the program");
         }
-        String path = args[0];
+        ArgsModel argsModel = new ArgsModel();
 
-        fillPost();
+        SearchParams.SearchParamsBuilder searchParams = SearchParams.builder();
+        for (int i = 0; i < args.length; i++) {
 
-        List<String> parsed = read(new File(path));
-        List<Employee> employees = new ArrayList<>();
-        for (String employee : parsed) {
-            Employee empl = parse(employee);
-            Collections.sort(empl.getCharacteristics());
-            employees.add(empl);
-        }
-
-        employees.sort(Comparator.comparing(Employee::getLastName).thenComparing(Employee::getFirstName));
-
-        print(employees);
-
-    }
-
-    public static void fillPost() {
-        posts.put(UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707"), "Engineer");
-        posts.put(UUID.fromString("762d15a5-3bc9-43ef-ae96-02a680a557d0"), "Tech Writer");
-    }
-
-    public static List<String> read(File file) {
-        List<String> parsed = new ArrayList<>();
-        try (Scanner scanner = new Scanner(file)) {
-            scanner.useDelimiter("((\\n\\r)|(\\r\\n)){2}|(\\r){2}|(\\n){2}");
-            while (scanner.hasNext()) {
-                parsed.add(scanner.next());
+            if (args[i].equals("-file")) {
+                argsModel.setPath(args[i + 1]);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return parsed;
-    }
-
-    public static Employee parse(String employee) {
-        String[] part = employee.split("\n");
-        String firstName = "";
-        String lastName = "";
-        String description = "";
-        String post = "";
-        List<String> characteristics = new ArrayList<>();
-        for (String tmp : part) {
-            if (tmp.startsWith("firstName:")) {
-                firstName = tmp.replaceFirst("firstName:", "").trim();
+            if (args[i].equals("-searchByName")) {
+                searchParams.name(args[i + 1]);
             }
-            if (tmp.startsWith("lastName:")) {
-                lastName = tmp.replaceFirst("lastName:", "").trim();
-            }
-            if (tmp.startsWith("description:")) {
-                description = tmp.replaceFirst("description:", "").trim();
-            }
-            if (tmp.startsWith("characteristics:")) {
-                characteristics.addAll(List.of(tmp.replaceFirst("characteristics:", "").trim().split(",")));
-            }
-            if (tmp.startsWith("postId:")) {
-                post = posts.get(UUID.fromString(tmp.replaceFirst("postId:", "").trim()));
+            if (args[i].equals("-searchByPostID")) {
+                searchParams.postId(UUID.fromString(args[i + 1]));
             }
         }
-        if (firstName.isBlank() || lastName.isBlank() || characteristics.isEmpty() || post.isBlank()) {
-            throw new NullPointerException("All the fields except description must be not blank");
-        }
-        return new Employee(firstName, lastName, description, characteristics, post);
-    }
-
-    private static void print(List<Employee> employees) {
-        for (Employee employee : employees) {
-            System.out.println(employee);
-            System.out.println();
-        }
+        argsModel.setSearchParams(searchParams.build());
+        return argsModel;
     }
 }
