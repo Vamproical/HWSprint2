@@ -1,11 +1,10 @@
 package com.ws.hw1.mapper;
 
+import com.ws.hw1.controller.dto.employee.EmployeeDto;
 import com.ws.hw1.model.Employee;
-import com.ws.hw1.model.EmployeeFromFile;
-import com.ws.hw1.model.Post;
 import org.mapstruct.Mapper;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface EmployeeMapper {
-    Employee toEmployee(EmployeeFromFile fromFile, Post post);
+    EmployeeDto toDTO(Employee employee);
 }

@@ -1,6 +1,8 @@
 package com.ws.hw1.service;
 
-import com.ws.hw1.model.EmployeeFromFile;
+import com.ws.hw1.parser.EmployeeFromFile;
+import com.ws.hw1.parser.Parser;
+import com.ws.hw1.parser.ParserFromJson;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,13 +27,13 @@ class ParseServiceImplTest {
                     "love of Learning",
                     "pragmatism"),
             "762d15a5-3bc9-43ef-ae96-02a680a557d0");
-    private final ParseService parseService = new ParseServiceImpl();
+    private final Parser parseService = new ParserFromJson();
 
     @Test
     void read() {
         List<EmployeeFromFile> expected = List.of(EMPLOYEE_FROM_FILE, EMPLOYEE_FROM_FILE1);
         File file = new File(ParseServiceImplTest.class.getClassLoader().getResource("employees.json").getFile());
-        List<EmployeeFromFile> actual = parseService.parseJsonFile(file);
+        List<EmployeeFromFile> actual = parseService.parse(file);
         Assertions.assertEquals(expected, actual);
     }
 

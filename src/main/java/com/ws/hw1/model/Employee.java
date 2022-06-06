@@ -1,23 +1,32 @@
 package com.ws.hw1.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString
+@Data
 @Builder
 public class Employee {
-    @NonNull
+    @NotNull
+    private UUID id;
+
+    @NotBlank
     private String firstName;
-    @NonNull
+
+    @NotBlank
     private String lastName;
+
     private String description;
-    @NonNull
+
+    @NotNull
     private List<String> characteristics;
-    @NonNull
+
+    @NotNull
     private Post post;
 }
