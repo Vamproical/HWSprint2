@@ -3,17 +3,18 @@ package com.ws.hw1.service.post;
 import com.ws.hw1.model.Post;
 import com.ws.hw1.service.argument.CreatePostArgument;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
 public interface PostService {
-    Post get(UUID postId);
+    Post get(@NotNull UUID postId);
 
-    Post create(CreatePostArgument argumentPost);
+    Post create(@NotNull CreatePostArgument argumentPost);
 
-    Post update(UUID id, CreatePostArgument argumentPost);
+    Post update(@NotNull UUID id, @NotNull CreatePostArgument argumentPost);
 
-    void delete(UUID id);
+    void delete(@NotNull UUID id);
 
     List<Post> getAll();
 }

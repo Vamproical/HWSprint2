@@ -1,5 +1,6 @@
-package com.ws.hw1.controller.dto.employee;
+package com.ws.hw1.controller.employee.dto;
 
+import com.ws.hw1.model.JobType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,4 +21,8 @@ public class CreateEmployeeDto {
     private List<String> characteristics;
     @NotNull
     private UUID postId;
+    @NotNull
+    private ContactsDto contacts;
+    @NotNull
+    private JobType jobType;
 }

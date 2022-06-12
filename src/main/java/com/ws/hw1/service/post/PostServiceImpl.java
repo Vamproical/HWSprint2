@@ -1,8 +1,8 @@
 package com.ws.hw1.service.post;
 
-import com.ws.hw1.exceptionHandler.exception.NotFoundException;
 import com.ws.hw1.model.Post;
 import com.ws.hw1.service.argument.CreatePostArgument;
+import com.ws.hw1.utils.Guard;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -13,29 +13,35 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post get(UUID id) {
-        throwExceptionIfNotExits(id);
+        Guard.check(!posts.containsKey(id), "id not found");
         return posts.get(id);
     }
 
     @Override
     public Post create(CreatePostArgument argumentPost) {
         UUID id = UUID.randomUUID();
-        Post post = createPost(id, argumentPost);
+        Post post = Post.builder()
+                        .id(id)
+                        .name(argumentPost.getName()).build();
+
         posts.put(id, post);
+
         return post;
     }
 
     @Override
     public Post update(UUID id, CreatePostArgument argumentPost) {
-        throwExceptionIfNotExits(id);
-        Post post = createPost(id, argumentPost);
-        posts.replace(id, post);
+        Guard.check(!posts.containsKey(id), "id not found");
+
+        Post post = get(id);
+        post.setName(argumentPost.getName());
+
         return post;
     }
 
     @Override
     public void delete(UUID id) {
-        throwExceptionIfNotExits(id);
+        Guard.check(!posts.containsKey(id), "id not found");
         posts.remove(id);
     }
 
@@ -44,14 +50,4 @@ public class PostServiceImpl implements PostService {
         return new ArrayList<>(posts.values());
     }
 
-    private void throwExceptionIfNotExits(UUID id) {
-        if (!posts.containsKey(id)) {
-            throw new NotFoundException();
-        }
-    }
-
-    private Post createPost(UUID id, CreatePostArgument postArgument) {
-        return new Post(id,
-                postArgument.getName());
-    }
 }

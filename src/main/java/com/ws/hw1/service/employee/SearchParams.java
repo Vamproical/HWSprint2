@@ -1,15 +1,11 @@
 package com.ws.hw1.service.employee;
 
-import lombok.*;
+import lombok.Value;
 
 import java.util.UUID;
 
-@AllArgsConstructor
-@Getter
-@Setter
-@EqualsAndHashCode
-@Builder
+@Value
 public class SearchParams {
-    private String name;
-    private UUID postId;
+    String name;
+    UUID postId;
 }

@@ -3,18 +3,19 @@ package com.ws.hw1.service.employee;
 import com.ws.hw1.model.Employee;
 import com.ws.hw1.service.argument.CreateEmployeeArgument;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
 public interface EmployeeService {
 
-    Employee create(CreateEmployeeArgument employeeArgument);
+    Employee create(@NotNull CreateEmployeeArgument employeeArgument);
 
-    Employee update(UUID id, CreateEmployeeArgument employeeArgument);
+    Employee update(@NotNull UUID id, @NotNull CreateEmployeeArgument employeeArgument);
 
-    void delete(UUID id);
+    void delete(@NotNull UUID id);
 
-    Employee get(UUID id);
+    Employee get(@NotNull UUID id);
 
-    List<Employee> getAll(SearchParams searchParams);
+    List<Employee> getAll(@NotNull SearchParams searchParams);
 }

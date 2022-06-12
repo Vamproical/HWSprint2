@@ -1,5 +1,7 @@
-package com.ws.hw1.controller.dto.employee;
+package com.ws.hw1.controller.employee.dto;
 
+import com.ws.hw1.model.Contacts;
+import com.ws.hw1.model.JobType;
 import com.ws.hw1.model.Post;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -22,4 +24,9 @@ public class EmployeeDto {
     private List<String> characteristics;
     @ApiModelProperty("Должность сотрудника")
     private Post post;
+    @ApiModelProperty("Контактные данные сотрудника")
+    private Contacts contacts;
+    @ApiModelProperty("Тип работы")
+    private JobType jobType;
+
 }

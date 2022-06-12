@@ -1,7 +1,7 @@
 package com.ws.hw1.controller;
 
-import com.ws.hw1.controller.dto.post.CreatePostDto;
-import com.ws.hw1.controller.dto.post.PostDto;
+import com.ws.hw1.controller.post.dto.CreatePostDto;
+import com.ws.hw1.controller.post.dto.PostDto;
 import com.ws.hw1.service.argument.CreatePostArgument;
 import com.ws.hw1.service.post.PostService;
 import org.junit.jupiter.api.Assertions;

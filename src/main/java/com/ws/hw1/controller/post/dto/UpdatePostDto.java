@@ -1,4 +1,4 @@
-package com.ws.hw1.controller.dto.post;
+package com.ws.hw1.controller.post.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreatePostDto {
+public class UpdatePostDto {
     @NotBlank
     String name;
 }
