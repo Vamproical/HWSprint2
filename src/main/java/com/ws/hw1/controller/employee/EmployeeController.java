@@ -9,6 +9,7 @@ import com.ws.hw1.controller.employee.mapper.EmployeeMapper;
 import com.ws.hw1.exceptionHandler.exception.NotFoundException;
 import com.ws.hw1.model.Employee;
 import com.ws.hw1.service.argument.CreateEmployeeArgument;
+import com.ws.hw1.service.argument.UpdateEmployeeArgument;
 import com.ws.hw1.service.employee.EmployeeService;
 import com.ws.hw1.service.employee.SearchParams;
 import io.swagger.annotations.ApiOperation;
@@ -42,7 +43,7 @@ public class EmployeeController {
     @ApiOperation("Обновить характеристики сотрудника")
     @PutMapping("{id}/update")
     public EmployeeDto updateEmployee(@PathVariable UUID id, @RequestBody @Valid UpdateEmployeeDto employeeDto) throws NotFoundException {
-        CreateEmployeeArgument employeeArgument = updateEmployeeArgumentAction.execute(employeeDto);
+        UpdateEmployeeArgument employeeArgument = updateEmployeeArgumentAction.execute(employeeDto);
         Employee updatedPost = employeeService.update(id, employeeArgument);
         return employeeMapper.toDTO(updatedPost);
     }
@@ -55,7 +56,7 @@ public class EmployeeController {
 
     @ApiOperation("Получить сотрудника по индентификатору")
     @GetMapping("{id}")
-    public EmployeeDto getById(@PathVariable UUID id) throws NotFoundException {
+    public EmployeeDto getById(@PathVariable UUID id) throws NotFoundException  {
         return employeeMapper.toDTO(employeeService.get(id));
     }
 

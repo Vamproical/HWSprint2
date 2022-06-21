@@ -39,10 +39,7 @@ public class PostController {
     @ApiOperation("Обновить должность")
     @PutMapping("{id}/update")
     public PostDto updatePost(@PathVariable UUID id, @RequestBody @Valid UpdatePostDto postDto) throws NotFoundException {
-        CreatePostArgument postArgument = CreatePostArgument.builder()
-                                                            .name(postDto.getName())
-                                                            .build();
-        Post updatedPost = postService.update(id, postArgument);
+        Post updatedPost = postService.update(id, postDto);
         return postMapper.toDTO(updatedPost);
     }
 

@@ -1,5 +1,6 @@
 package com.ws.hw1.service.post;
 
+import com.ws.hw1.controller.post.dto.UpdatePostDto;
 import com.ws.hw1.model.Post;
 import com.ws.hw1.service.argument.CreatePostArgument;
 import com.ws.hw1.utils.Guard;
@@ -13,7 +14,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post get(UUID id) {
-        Guard.check(!posts.containsKey(id), "id not found");
+        Guard.check(posts.containsKey(id), "id not found");
         return posts.get(id);
     }
 
@@ -30,8 +31,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post update(UUID id, CreatePostArgument argumentPost) {
-        Guard.check(!posts.containsKey(id), "id not found");
+    public Post update(UUID id, UpdatePostDto argumentPost) {
+        Guard.check(posts.containsKey(id), "id not found");
 
         Post post = get(id);
         post.setName(argumentPost.getName());
@@ -41,7 +42,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void delete(UUID id) {
-        Guard.check(!posts.containsKey(id), "id not found");
+        Guard.check(posts.containsKey(id), "id not found");
         posts.remove(id);
     }
 

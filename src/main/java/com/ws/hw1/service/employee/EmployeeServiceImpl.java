@@ -1,7 +1,9 @@
 package com.ws.hw1.service.employee;
 
+import com.ws.hw1.controller.employee.dto.UpdateEmployeeDto;
 import com.ws.hw1.model.Employee;
 import com.ws.hw1.service.argument.CreateEmployeeArgument;
+import com.ws.hw1.service.argument.UpdateEmployeeArgument;
 import com.ws.hw1.utils.Guard;
 import org.springframework.stereotype.Service;
 
@@ -33,9 +35,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee update(UUID id, CreateEmployeeArgument employeeArgument) {
-        Guard.check(!employees.containsKey(id), "id not found");
-
+    public Employee update(UUID id, UpdateEmployeeArgument employeeArgument) {
         Employee employee = get(id);
         employee.setFirstName(employeeArgument.getFirstName());
         employee.setLastName(employeeArgument.getLastName());
@@ -52,13 +52,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void delete(UUID id) {
-        Guard.check(!employees.containsKey(id), "id not found");
+        Guard.check(employees.containsKey(id), "id not found");
         employees.remove(id);
     }
 
     @Override
     public Employee get(UUID id) {
-        Guard.check(!employees.containsKey(id), "id not found");
+        Guard.check(employees.containsKey(id), "id not found");
         return employees.get(id);
     }
 

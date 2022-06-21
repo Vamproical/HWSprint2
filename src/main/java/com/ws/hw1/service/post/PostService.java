@@ -1,5 +1,6 @@
 package com.ws.hw1.service.post;
 
+import com.ws.hw1.controller.post.dto.UpdatePostDto;
 import com.ws.hw1.model.Post;
 import com.ws.hw1.service.argument.CreatePostArgument;
 
@@ -12,7 +13,7 @@ public interface PostService {
 
     Post create(@NotNull CreatePostArgument argumentPost);
 
-    Post update(@NotNull UUID id, @NotNull CreatePostArgument argumentPost);
+    Post update(@NotNull UUID id, @NotNull UpdatePostDto argumentPost);
 
     void delete(@NotNull UUID id);
 
