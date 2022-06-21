@@ -2,7 +2,6 @@ package com.ws.hw1.action;
 
 import com.ws.hw1.controller.employee.dto.UpdateEmployeeDto;
 import com.ws.hw1.controller.employee.mapper.EmployeeMapper;
-import com.ws.hw1.service.argument.CreateEmployeeArgument;
 import com.ws.hw1.service.argument.UpdateEmployeeArgument;
 import com.ws.hw1.service.post.PostService;
 import lombok.RequiredArgsConstructor;

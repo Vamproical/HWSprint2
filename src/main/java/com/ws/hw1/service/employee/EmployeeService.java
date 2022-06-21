@@ -1,6 +1,5 @@
 package com.ws.hw1.service.employee;
 
-import com.ws.hw1.controller.employee.dto.UpdateEmployeeDto;
 import com.ws.hw1.model.Employee;
 import com.ws.hw1.service.argument.CreateEmployeeArgument;
 import com.ws.hw1.service.argument.UpdateEmployeeArgument;

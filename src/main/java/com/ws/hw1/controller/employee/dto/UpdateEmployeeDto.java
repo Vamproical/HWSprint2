@@ -3,7 +3,6 @@ package com.ws.hw1.controller.employee.dto;
 import com.ws.hw1.model.JobType;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.jackson.Jacksonized;
 
 import javax.validation.constraints.NotBlank;

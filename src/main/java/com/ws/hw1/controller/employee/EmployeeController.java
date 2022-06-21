@@ -56,7 +56,7 @@ public class EmployeeController {
 
     @ApiOperation("Получить сотрудника по индентификатору")
     @GetMapping("{id}")
-    public EmployeeDto getById(@PathVariable UUID id) throws NotFoundException  {
+    public EmployeeDto getById(@PathVariable UUID id) throws NotFoundException {
         return employeeMapper.toDTO(employeeService.get(id));
     }
 
