@@ -35,7 +35,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public Employee update(UUID id, UpdateEmployeeArgument employeeArgument) {
-        Employee employee = get(id);
+        Employee employee = getExisting(id);
         employee.setFirstName(employeeArgument.getFirstName());
         employee.setLastName(employeeArgument.getLastName());
         employee.setDescription(employeeArgument.getDescription());
@@ -51,13 +51,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void delete(UUID id) {
-        Guard.check(employees.containsKey(id), "id not found");
+        Guard.check(employees.containsKey(id), "The deleted employee id not found");
         employees.remove(id);
     }
 
     @Override
-    public Employee get(UUID id) {
-        Guard.check(employees.containsKey(id), "id not found");
+    public Employee getExisting(UUID id) {
+        Guard.check(employees.containsKey(id), "The specified employee id not found");
         return employees.get(id);
     }
 
@@ -74,7 +74,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     private Predicate<Employee> filter(SearchParams params) {
-        Predicate<Employee> predicate = (x) -> true;
+        Predicate<Employee> predicate = x -> true;
 
         if (params.getName() != null) {
             predicate = predicate.and(employee -> employee.getFirstName().toLowerCase().contains(params.getName().toLowerCase()) ||

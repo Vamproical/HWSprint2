@@ -3,7 +3,7 @@ package com.ws.hw1.controller;
 import com.ws.hw1.controller.post.dto.CreatePostDto;
 import com.ws.hw1.controller.post.dto.PostDto;
 import com.ws.hw1.controller.post.dto.UpdatePostDto;
-import com.ws.hw1.exceptionHandler.exception.NotFoundException;
+import com.ws.hw1.exceptionhandler.exception.NotFoundException;
 import com.ws.hw1.model.Post;
 import com.ws.hw1.service.argument.CreatePostArgument;
 import com.ws.hw1.service.post.PostService;
@@ -37,105 +37,105 @@ class PostControllerIT {
     private PostService postService;
 
     @Test
-    void post() {
-        //arrange
+    void create() {
+        //Arrange
         when(postService.create(postArgument)).thenReturn(post);
 
-        //act
-        PostDto postDto = webTestClient.post()
+        //Act
+        PostDto actual = webTestClient.post()
                                        .uri(uriBuilder -> uriBuilder.path("post/create")
                                                                     .build())
                                        .bodyValue(createDto)
                                        .exchange()
-                                       //assert
+                                       //Assert
                                        .expectStatus()
                                        .isCreated()
                                        .expectBody(PostDto.class)
                                        .returnResult()
                                        .getResponseBody();
 
+        PostDto expected = new PostDto(id, "Tech Writer");
+
         verify(postService).create(postArgument);
-        Assertions.assertEquals(post.getName(), postDto.getName());
+        Assertions.assertEquals(expected,actual);
     }
 
     @Test
     void get() {
-        //arrange
+        //Arrange
         doReturn(post).when(postService).get(any());
 
-        //act
-        PostDto postDto = webTestClient.get()
-                                       .uri(uriBuilder -> uriBuilder.path("post/" + id)
-                                                                    .build())
+        //Act
+        PostDto actual = webTestClient.get()
+                                       .uri("post/{id}", id)
                                        .exchange()
-                                       //arrange
+                                       //Arrange
                                        .expectStatus()
                                        .isOk()
                                        .expectBody(PostDto.class)
                                        .returnResult()
                                        .getResponseBody();
 
+        PostDto expected = new PostDto(id, "Tech Writer");
+
         verify(postService).get(id);
-        Assertions.assertEquals(post.getId(), postDto.getId());
-        Assertions.assertEquals(post.getName(), postDto.getName());
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
     void tryGetAndGetNotFound() {
-        //arrange
+        //Arrange
         UUID id = UUID.randomUUID();
         doThrow(NotFoundException.class).when(postService).get(id);
 
-        //act
+        //Act
         webTestClient.get()
-                     .uri(uriBuilder -> uriBuilder.path("post/" + id)
-                                                  .build())
+                     .uri("post/{id}", id)
                      .exchange()
-                     //arrange
+                     //Arrange
                      .expectStatus()
                      .isNotFound()
                      .expectBody(String.class)
-                     .isEqualTo("The specified id is not found");
+                     .isEqualTo("The post id not found");
     }
 
     @Test
     void update() {
-        //assert
+        //Assert
         doReturn(updatedPost).when(postService).update(any(), any());
 
-        //act
-        PostDto postDto = webTestClient.put()
-                                       .uri(uriBuilder -> uriBuilder.path("post/" + id + "/update")
-                                                                    .build())
+        //Act
+        PostDto actual = webTestClient.put()
+                                       .uri("post/{id}/update", id)
                                        .bodyValue(updateDto)
                                        .exchange()
-                                       //arrange
+                                       //Arrange
                                        .expectStatus()
                                        .isOk()
                                        .expectBody(PostDto.class)
                                        .returnResult()
                                        .getResponseBody();
 
+        PostDto expected = new PostDto(id, "Lead Developer");
+
         verify(postService).update(id, updateDto);
-        Assertions.assertEquals(updatedPost.getId(), postDto.getId());
-        Assertions.assertEquals(updatedPost.getName(), postDto.getName());
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
     void tryUpdateAndGetNotFound() {
-        //assert
+        //Assert
         doThrow(NotFoundException.class).when(postService).update(any(), any());
 
-        //act
+        //Act
         webTestClient.put()
-                     .uri(uriBuilder -> uriBuilder.path("post/" + id + "/update")
-                                                  .build())
+                     .uri("post/{id}/update", id)
                      .bodyValue(updateDto)
                      .exchange()
-                     //arrange
+                     //Arrange
                      .expectStatus()
                      .isNotFound()
                      .expectBody(String.class)
-                     .isEqualTo("The specified id is not found");
+                     .isEqualTo("The post id is not found");
     }
 }

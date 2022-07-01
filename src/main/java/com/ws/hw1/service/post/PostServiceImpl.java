@@ -14,7 +14,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post get(UUID id) {
-        Guard.check(posts.containsKey(id), "id not found");
+        Guard.check(posts.containsKey(id), "The post id not found");
         return posts.get(id);
     }
 
@@ -32,7 +32,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Post update(UUID id, UpdatePostDto argumentPost) {
-        Guard.check(posts.containsKey(id), "id not found");
+        Guard.check(posts.containsKey(id), "The updated post id not found");
 
         Post post = get(id);
         post.setName(argumentPost.getName());
@@ -42,7 +42,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void delete(UUID id) {
-        Guard.check(posts.containsKey(id), "id not found");
+        Guard.check(posts.containsKey(id), "The deleted post id not found");
         posts.remove(id);
     }
 

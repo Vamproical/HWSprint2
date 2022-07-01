@@ -16,7 +16,7 @@ public interface EmployeeService {
 
     void delete(@NotNull UUID id);
 
-    Employee get(@NotNull UUID id);
+    Employee getExisting(@NotNull UUID id);
 
     List<Employee> getAll(@NotNull SearchParams searchParams);
 }

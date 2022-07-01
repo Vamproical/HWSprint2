@@ -4,7 +4,7 @@ import com.ws.hw1.controller.post.dto.CreatePostDto;
 import com.ws.hw1.controller.post.dto.PostDto;
 import com.ws.hw1.controller.post.dto.UpdatePostDto;
 import com.ws.hw1.controller.post.mapper.PostMapper;
-import com.ws.hw1.exceptionHandler.exception.NotFoundException;
+import com.ws.hw1.exceptionhandler.exception.NotFoundException;
 import com.ws.hw1.model.Post;
 import com.ws.hw1.service.argument.CreatePostArgument;
 import com.ws.hw1.service.post.PostService;
