@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler
-    public String handleNotFoundException(NotFoundException ex) {
-        return ex.getMessage();
+    @ExceptionHandler(NotFoundException.class)
+    public ErrorDto handleNotFoundException(NotFoundException ex) {
+        return ErrorDto.builder()
+                       .message(ex.getMessage())
+                       .build();
     }
 }

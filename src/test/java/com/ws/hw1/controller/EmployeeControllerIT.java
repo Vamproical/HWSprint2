@@ -5,8 +5,8 @@ import com.ws.hw1.controller.employee.dto.ContactsDto;
 import com.ws.hw1.controller.employee.dto.CreateEmployeeDto;
 import com.ws.hw1.controller.employee.dto.EmployeeDto;
 import com.ws.hw1.controller.employee.dto.UpdateEmployeeDto;
-import com.ws.hw1.controller.employee.mapper.EmployeeMapper;
 import com.ws.hw1.controller.post.dto.PostDto;
+import com.ws.hw1.exceptionhandler.ErrorDto;
 import com.ws.hw1.exceptionhandler.exception.NotFoundException;
 import com.ws.hw1.model.Employee;
 import com.ws.hw1.model.JobType;
@@ -25,10 +25,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -38,8 +35,6 @@ import static org.mockito.Mockito.*;
 class EmployeeControllerIT {
     private final List<Employee> employees = new ArrayList<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
-    @Autowired
-    private EmployeeMapper employeeMapper;
     @Autowired
     private WebTestClient webTestClient;
     @SpyBean
@@ -59,15 +54,19 @@ class EmployeeControllerIT {
     }
 
     @Test
-    void create() {
+    void create() throws IOException {
         //Arrange
         Employee employee = employees.get(0);
 
         Post post = employee.getPost();
 
-        doReturn(post).when(postService).get(any());
+        doReturn(post).when(postService).getExisting(any());
 
-        CreateEmployeeDto createEmployeeDto = employeeMapper.toCreateDTO(employee, employee.getPost().getId());
+        CreateEmployeeDto createEmployeeDto = objectMapper.readValue(new File(Objects.requireNonNull(EmployeeControllerIT.class
+                                                                                             .getClassLoader()
+                                                                                             .getResource("create_employee_dto.json"))
+                                                                                     .getFile()),
+                CreateEmployeeDto.class);
 
         doReturn(employee).when(employeeService).create(any());
 
@@ -108,14 +107,14 @@ class EmployeeControllerIT {
 
         //Act
         EmployeeDto actual = webTestClient.get()
-                                               .uri("employee/{id}", id)
-                                               .exchange()
-                                               //Arrange
-                                               .expectStatus()
-                                               .isOk()
-                                               .expectBody(EmployeeDto.class)
-                                               .returnResult()
-                                               .getResponseBody();
+                                          .uri("employee/{id}", id)
+                                          .exchange()
+                                          //Arrange
+                                          .expectStatus()
+                                          .isOk()
+                                          .expectBody(EmployeeDto.class)
+                                          .returnResult()
+                                          .getResponseBody();
 
         EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c5-b0b1-4a33-ae68-4d0d5feab2d6"),
                 "Геннадий",
@@ -134,7 +133,11 @@ class EmployeeControllerIT {
     void tryGetAndGetNotFound() {
         //Arrange
         UUID id = UUID.randomUUID();
-        doThrow(NotFoundException.class).when(employeeService).getExisting(id);
+        doThrow(new NotFoundException("The employee not found")).when(employeeService).getExisting(id);
+
+        ErrorDto errorDto = ErrorDto.builder()
+                                    .message("The employee not found")
+                                    .build();
 
         //Act
         webTestClient.get()
@@ -143,8 +146,8 @@ class EmployeeControllerIT {
                      //Arrange
                      .expectStatus()
                      .isNotFound()
-                     .expectBody(String.class)
-                     .isEqualTo("The specified id is not found");
+                     .expectBody(ErrorDto.class)
+                     .isEqualTo(errorDto);
     }
 
     @Test
@@ -153,7 +156,11 @@ class EmployeeControllerIT {
         Employee employee = employees.get(0);
         Employee excepted = employees.get(2);
 
-        ContactsDto contactsDto = employeeMapper.toDTO(employee.getContacts());
+        ContactsDto contactsDto = ContactsDto.builder()
+                                             .phone(employee.getContacts().getPhone())
+                                             .email(employee.getContacts().getEmail())
+                                             .workEmail(employee.getContacts().getWorkEmail())
+                                             .build();
 
         UpdateEmployeeDto updateEmployeeDto = UpdateEmployeeDto.builder()
                                                                .firstName("Павел")
@@ -168,20 +175,20 @@ class EmployeeControllerIT {
 
         Post post = employee.getPost();
 
-        doReturn(post).when(postService).get(any());
+        doReturn(post).when(postService).getExisting(any());
         doReturn(excepted).when(employeeService).update(any(), any());
 
         //Act
         EmployeeDto actual = webTestClient.put()
-                                               .uri("employee/{id}/update", id)
-                                               .bodyValue(updateEmployeeDto)
-                                               .exchange()
-                                               //Assert
-                                               .expectStatus()
-                                               .isOk()
-                                               .expectBody(EmployeeDto.class)
-                                               .returnResult()
-                                               .getResponseBody();
+                                          .uri("employee/{id}/update", id)
+                                          .bodyValue(updateEmployeeDto)
+                                          .exchange()
+                                          //Assert
+                                          .expectStatus()
+                                          .isOk()
+                                          .expectBody(EmployeeDto.class)
+                                          .returnResult()
+                                          .getResponseBody();
 
         EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c4-b0b1-4a33-ae68-4d0d5feab2d6"),
                 "Павел",
@@ -192,7 +199,7 @@ class EmployeeControllerIT {
                 new ContactsDto("+79247521321", "personalEmail@gmail.com", "workEmail@ya.ru"),
                 JobType.FULL_TIME);
 
-        verify(postService).get(post.getId());
+        verify(postService).getExisting(post.getId());
         Assertions.assertEquals(expected, actual);
     }
 
@@ -201,7 +208,11 @@ class EmployeeControllerIT {
         //Arrange
         Employee employee = employees.get(0);
 
-        ContactsDto contactsDto = employeeMapper.toDTO(employee.getContacts());
+        ContactsDto contactsDto = ContactsDto.builder()
+                                             .phone(employee.getContacts().getPhone())
+                                             .email(employee.getContacts().getEmail())
+                                             .workEmail(employee.getContacts().getWorkEmail())
+                                             .build();
 
         UpdateEmployeeDto employeeDto = UpdateEmployeeDto.builder()
                                                          .firstName(employee.getFirstName())
@@ -212,8 +223,13 @@ class EmployeeControllerIT {
                                                          .contacts(contactsDto)
                                                          .jobType(employee.getJobType())
                                                          .build();
+
         UUID id = UUID.randomUUID();
         doThrow(NotFoundException.class).when(employeeService).update(any(), any());
+
+        ErrorDto errorDto = ErrorDto.builder()
+                                    .message("The post not found")
+                                    .build();
 
         //Act
         webTestClient.put()
@@ -223,8 +239,8 @@ class EmployeeControllerIT {
                      //Arrange
                      .expectStatus()
                      .isNotFound()
-                     .expectBody(String.class)
-                     .isEqualTo("The employee id not found");
+                     .expectBody(ErrorDto.class)
+                     .isEqualTo(errorDto);
     }
 
     @Test
@@ -236,15 +252,15 @@ class EmployeeControllerIT {
 
         //Act
         List<EmployeeDto> actual = webTestClient.get()
-                                                     .uri(uriBuilder -> uriBuilder.path("employee/list")
-                                                                                  .build())
-                                                     .exchange()
-                                                     //Arrange
-                                                     .expectStatus()
-                                                     .isOk()
-                                                     .expectBodyList(EmployeeDto.class)
-                                                     .returnResult()
-                                                     .getResponseBody();
+                                                .uri(uriBuilder -> uriBuilder.path("employee/list")
+                                                                             .build())
+                                                .exchange()
+                                                //Arrange
+                                                .expectStatus()
+                                                .isOk()
+                                                .expectBodyList(EmployeeDto.class)
+                                                .returnResult()
+                                                .getResponseBody();
 
         EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c5-b0b1-4a33-ae68-4d0d5feab2d6"),
                 "Геннадий",
@@ -279,16 +295,16 @@ class EmployeeControllerIT {
 
         //Act
         List<EmployeeDto> actual = webTestClient.get()
-                                                     .uri(uriBuilder -> uriBuilder.path("employee/list")
-                                                                                  .queryParam("name", "Павел")
-                                                                                  .build())
-                                                     .exchange()
-                                                     //Arrange
-                                                     .expectStatus()
-                                                     .isOk()
-                                                     .expectBodyList(EmployeeDto.class)
-                                                     .returnResult()
-                                                     .getResponseBody();
+                                                .uri(uriBuilder -> uriBuilder.path("employee/list")
+                                                                             .queryParam("name", "Павел")
+                                                                             .build())
+                                                .exchange()
+                                                //Arrange
+                                                .expectStatus()
+                                                .isOk()
+                                                .expectBodyList(EmployeeDto.class)
+                                                .returnResult()
+                                                .getResponseBody();
 
         EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c4-b0b1-4a33-ae68-4d0d5feab2d6"),
                 "Павел",
@@ -312,16 +328,16 @@ class EmployeeControllerIT {
 
         //Act
         List<EmployeeDto> actual = webTestClient.get()
-                                                     .uri(uriBuilder -> uriBuilder.path("employee/list")
-                                                                                  .queryParam("name", "Кузьмин")
-                                                                                  .build())
-                                                     .exchange()
-                                                     //Arrange
-                                                     .expectStatus()
-                                                     .isOk()
-                                                     .expectBodyList(EmployeeDto.class)
-                                                     .returnResult()
-                                                     .getResponseBody();
+                                                .uri(uriBuilder -> uriBuilder.path("employee/list")
+                                                                             .queryParam("name", "Кузьмин")
+                                                                             .build())
+                                                .exchange()
+                                                //Arrange
+                                                .expectStatus()
+                                                .isOk()
+                                                .expectBodyList(EmployeeDto.class)
+                                                .returnResult()
+                                                .getResponseBody();
 
         EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c4-b0b1-4a33-ae68-4d0d5feab2d6"),
                 "Павел",
@@ -345,16 +361,16 @@ class EmployeeControllerIT {
 
         //Act
         List<EmployeeDto> actual = webTestClient.get()
-                                                     .uri(uriBuilder -> uriBuilder.path("employee/list")
-                                                                                  .queryParam("postId", "762d15a5-3bc9-43ef-ae96-02a680a557d0")
-                                                                                  .build())
-                                                     .exchange()
-                                                     //Arrange
-                                                     .expectStatus()
-                                                     .isOk()
-                                                     .expectBodyList(EmployeeDto.class)
-                                                     .returnResult()
-                                                     .getResponseBody();
+                                                .uri(uriBuilder -> uriBuilder.path("employee/list")
+                                                                             .queryParam("postId", "762d15a5-3bc9-43ef-ae96-02a680a557d0")
+                                                                             .build())
+                                                .exchange()
+                                                //Arrange
+                                                .expectStatus()
+                                                .isOk()
+                                                .expectBodyList(EmployeeDto.class)
+                                                .returnResult()
+                                                .getResponseBody();
 
 
         EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c5-b0b1-4a33-ae68-4d0d5feab2d5"),
@@ -403,17 +419,17 @@ class EmployeeControllerIT {
 
         //Act
         List<EmployeeDto> actual = webTestClient.get()
-                                                     .uri(uriBuilder -> uriBuilder.path("employee/list")
-                                                                                  .queryParam("name", "Кузьмин")
-                                                                                  .queryParam("postId", "854ef89d-6c27-4635-926d-894d76a81707")
-                                                                                  .build())
-                                                     .exchange()
-                                                     //Arrange
-                                                     .expectStatus()
-                                                     .isOk()
-                                                     .expectBodyList(EmployeeDto.class)
-                                                     .returnResult()
-                                                     .getResponseBody();
+                                                .uri(uriBuilder -> uriBuilder.path("employee/list")
+                                                                             .queryParam("name", "Кузьмин")
+                                                                             .queryParam("postId", "854ef89d-6c27-4635-926d-894d76a81707")
+                                                                             .build())
+                                                .exchange()
+                                                //Arrange
+                                                .expectStatus()
+                                                .isOk()
+                                                .expectBodyList(EmployeeDto.class)
+                                                .returnResult()
+                                                .getResponseBody();
 
         EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c5-b0b1-4a33-ae68-4d0d5feab2d6"),
                 "Геннадий",

@@ -52,7 +52,7 @@ public class PostController {
     @ApiOperation("Получить должность по индентификатору")
     @GetMapping("{id}")
     public PostDto getById(@PathVariable UUID id) throws NotFoundException {
-        return postMapper.toDTO(postService.get(id));
+        return postMapper.toDTO(postService.getExisting(id));
     }
 
     @ApiOperation("Получить список должностей")

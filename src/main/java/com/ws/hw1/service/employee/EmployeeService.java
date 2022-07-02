@@ -3,20 +3,20 @@ package com.ws.hw1.service.employee;
 import com.ws.hw1.model.Employee;
 import com.ws.hw1.service.argument.CreateEmployeeArgument;
 import com.ws.hw1.service.argument.UpdateEmployeeArgument;
+import lombok.NonNull;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
 
 public interface EmployeeService {
 
-    Employee create(@NotNull CreateEmployeeArgument employeeArgument);
+    Employee create(@NonNull CreateEmployeeArgument employeeArgument);
 
-    Employee update(@NotNull UUID id, @NotNull UpdateEmployeeArgument employeeArgument);
+    Employee update(@NonNull UUID id, @NonNull UpdateEmployeeArgument employeeArgument);
 
-    void delete(@NotNull UUID id);
+    void delete(@NonNull UUID id);
 
-    Employee getExisting(@NotNull UUID id);
+    Employee getExisting(@NonNull UUID id);
 
-    List<Employee> getAll(@NotNull SearchParams searchParams);
+    List<Employee> getAll(@NonNull SearchParams searchParams);
 }

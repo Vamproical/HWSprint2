@@ -4,6 +4,7 @@ import com.ws.hw1.model.Employee;
 import com.ws.hw1.service.argument.CreateEmployeeArgument;
 import com.ws.hw1.service.argument.UpdateEmployeeArgument;
 import com.ws.hw1.utils.Guard;
+import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -15,7 +16,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     private final Map<UUID, Employee> employees = new HashMap<>();
 
     @Override
-    public Employee create(CreateEmployeeArgument employeeArgument) {
+    public Employee create(@NonNull CreateEmployeeArgument employeeArgument) {
         UUID id = UUID.randomUUID();
         Employee employee = Employee.builder()
                                     .id(id)
@@ -34,7 +35,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public Employee update(UUID id, UpdateEmployeeArgument employeeArgument) {
+    public Employee update(@NonNull UUID id, @NonNull UpdateEmployeeArgument employeeArgument) {
         Employee employee = getExisting(id);
         employee.setFirstName(employeeArgument.getFirstName());
         employee.setLastName(employeeArgument.getLastName());
@@ -50,19 +51,19 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void delete(UUID id) {
-        Guard.check(employees.containsKey(id), "The deleted employee id not found");
+    public void delete(@NonNull UUID id) {
+        Guard.check(employees.containsKey(id), "The employee not found");
         employees.remove(id);
     }
 
     @Override
-    public Employee getExisting(UUID id) {
-        Guard.check(employees.containsKey(id), "The specified employee id not found");
+    public Employee getExisting(@NonNull UUID id) {
+        Guard.check(employees.containsKey(id), "The employee not found");
         return employees.get(id);
     }
 
     @Override
-    public List<Employee> getAll(SearchParams params) {
+    public List<Employee> getAll(@NonNull SearchParams params) {
         Predicate<Employee> predicate = filter(params);
 
         return employees.values()

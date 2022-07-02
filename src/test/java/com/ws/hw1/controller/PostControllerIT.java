@@ -3,6 +3,7 @@ package com.ws.hw1.controller;
 import com.ws.hw1.controller.post.dto.CreatePostDto;
 import com.ws.hw1.controller.post.dto.PostDto;
 import com.ws.hw1.controller.post.dto.UpdatePostDto;
+import com.ws.hw1.exceptionhandler.ErrorDto;
 import com.ws.hw1.exceptionhandler.exception.NotFoundException;
 import com.ws.hw1.model.Post;
 import com.ws.hw1.service.argument.CreatePostArgument;
@@ -43,42 +44,42 @@ class PostControllerIT {
 
         //Act
         PostDto actual = webTestClient.post()
-                                       .uri(uriBuilder -> uriBuilder.path("post/create")
-                                                                    .build())
-                                       .bodyValue(createDto)
-                                       .exchange()
-                                       //Assert
-                                       .expectStatus()
-                                       .isCreated()
-                                       .expectBody(PostDto.class)
-                                       .returnResult()
-                                       .getResponseBody();
+                                      .uri(uriBuilder -> uriBuilder.path("post/create")
+                                                                   .build())
+                                      .bodyValue(createDto)
+                                      .exchange()
+                                      //Assert
+                                      .expectStatus()
+                                      .isCreated()
+                                      .expectBody(PostDto.class)
+                                      .returnResult()
+                                      .getResponseBody();
 
         PostDto expected = new PostDto(id, "Tech Writer");
 
         verify(postService).create(postArgument);
-        Assertions.assertEquals(expected,actual);
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
     void get() {
         //Arrange
-        doReturn(post).when(postService).get(any());
+        doReturn(post).when(postService).getExisting(any());
 
         //Act
         PostDto actual = webTestClient.get()
-                                       .uri("post/{id}", id)
-                                       .exchange()
-                                       //Arrange
-                                       .expectStatus()
-                                       .isOk()
-                                       .expectBody(PostDto.class)
-                                       .returnResult()
-                                       .getResponseBody();
+                                      .uri("post/{id}", id)
+                                      .exchange()
+                                      //Arrange
+                                      .expectStatus()
+                                      .isOk()
+                                      .expectBody(PostDto.class)
+                                      .returnResult()
+                                      .getResponseBody();
 
         PostDto expected = new PostDto(id, "Tech Writer");
 
-        verify(postService).get(id);
+        verify(postService).getExisting(id);
         Assertions.assertEquals(expected, actual);
     }
 
@@ -86,7 +87,11 @@ class PostControllerIT {
     void tryGetAndGetNotFound() {
         //Arrange
         UUID id = UUID.randomUUID();
-        doThrow(NotFoundException.class).when(postService).get(id);
+        doThrow(new NotFoundException("The post not found")).when(postService).getExisting(id);
+
+        ErrorDto errorDto = ErrorDto.builder()
+                                    .message("The post not found")
+                                    .build();
 
         //Act
         webTestClient.get()
@@ -95,8 +100,8 @@ class PostControllerIT {
                      //Arrange
                      .expectStatus()
                      .isNotFound()
-                     .expectBody(String.class)
-                     .isEqualTo("The post id not found");
+                     .expectBody(ErrorDto.class)
+                     .isEqualTo(errorDto);
     }
 
     @Test
@@ -106,15 +111,15 @@ class PostControllerIT {
 
         //Act
         PostDto actual = webTestClient.put()
-                                       .uri("post/{id}/update", id)
-                                       .bodyValue(updateDto)
-                                       .exchange()
-                                       //Arrange
-                                       .expectStatus()
-                                       .isOk()
-                                       .expectBody(PostDto.class)
-                                       .returnResult()
-                                       .getResponseBody();
+                                      .uri("post/{id}/update", id)
+                                      .bodyValue(updateDto)
+                                      .exchange()
+                                      //Arrange
+                                      .expectStatus()
+                                      .isOk()
+                                      .expectBody(PostDto.class)
+                                      .returnResult()
+                                      .getResponseBody();
 
         PostDto expected = new PostDto(id, "Lead Developer");
 
@@ -125,7 +130,11 @@ class PostControllerIT {
     @Test
     void tryUpdateAndGetNotFound() {
         //Assert
-        doThrow(NotFoundException.class).when(postService).update(any(), any());
+        doThrow(new NotFoundException("The post not found")).when(postService).update(any(), any());
+
+        ErrorDto errorDto = ErrorDto.builder()
+                                    .message("The post not found")
+                                    .build();
 
         //Act
         webTestClient.put()
@@ -135,7 +144,7 @@ class PostControllerIT {
                      //Arrange
                      .expectStatus()
                      .isNotFound()
-                     .expectBody(String.class)
-                     .isEqualTo("The post id is not found");
+                     .expectBody(ErrorDto.class)
+                     .isEqualTo(errorDto);
     }
 }

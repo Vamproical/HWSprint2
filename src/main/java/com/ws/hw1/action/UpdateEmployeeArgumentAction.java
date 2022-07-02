@@ -15,7 +15,7 @@ public class UpdateEmployeeArgumentAction {
     private final EmployeeMapper employeeMapper;
 
     public UpdateEmployeeArgument execute(UpdateEmployeeDto updateEmployeeDto) {
-        Post post = postService.get(updateEmployeeDto.getPostId());
+        Post post = postService.getExisting(updateEmployeeDto.getPostId());
         return employeeMapper.toUpdateArgument(updateEmployeeDto, post);
     }
 }

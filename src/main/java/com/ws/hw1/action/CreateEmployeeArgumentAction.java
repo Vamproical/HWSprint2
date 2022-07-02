@@ -15,8 +15,7 @@ public class CreateEmployeeArgumentAction {
     private final EmployeeMapper employeeMapper;
 
     public CreateEmployeeArgument execute(CreateEmployeeDto createEmployeeDto) {
-        Post post = postService.get(createEmployeeDto.getPostId());
+        Post post = postService.getExisting(createEmployeeDto.getPostId());
         return employeeMapper.toArgument(createEmployeeDto, post);
-        //employeeMapper.toModel(createEmployeeDto.getContacts()
     }
 }

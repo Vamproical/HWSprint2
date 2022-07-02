@@ -4,6 +4,7 @@ import com.ws.hw1.controller.post.dto.UpdatePostDto;
 import com.ws.hw1.model.Post;
 import com.ws.hw1.service.argument.CreatePostArgument;
 import com.ws.hw1.utils.Guard;
+import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -13,13 +14,13 @@ public class PostServiceImpl implements PostService {
     private final Map<UUID, Post> posts = new HashMap<>();
 
     @Override
-    public Post get(UUID id) {
-        Guard.check(posts.containsKey(id), "The post id not found");
+    public Post getExisting(@NonNull UUID id) {
+        Guard.check(posts.containsKey(id), "The post not found");
         return posts.get(id);
     }
 
     @Override
-    public Post create(CreatePostArgument argumentPost) {
+    public Post create(@NonNull CreatePostArgument argumentPost) {
         UUID id = UUID.randomUUID();
         Post post = Post.builder()
                         .id(id)
@@ -31,18 +32,18 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post update(UUID id, UpdatePostDto argumentPost) {
-        Guard.check(posts.containsKey(id), "The updated post id not found");
+    public Post update(@NonNull UUID id, @NonNull UpdatePostDto argumentPost) {
+        Guard.check(posts.containsKey(id), "The post not found");
 
-        Post post = get(id);
+        Post post = getExisting(id);
         post.setName(argumentPost.getName());
 
         return post;
     }
 
     @Override
-    public void delete(UUID id) {
-        Guard.check(posts.containsKey(id), "The deleted post id not found");
+    public void delete(@NonNull UUID id) {
+        Guard.check(posts.containsKey(id), "The post not found");
         posts.remove(id);
     }
 

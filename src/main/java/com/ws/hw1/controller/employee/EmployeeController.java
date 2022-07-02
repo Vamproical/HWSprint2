@@ -12,7 +12,6 @@ import com.ws.hw1.model.Employee;
 import com.ws.hw1.service.argument.CreateEmployeeArgument;
 import com.ws.hw1.service.argument.UpdateEmployeeArgument;
 import com.ws.hw1.service.employee.EmployeeService;
-import com.ws.hw1.service.employee.SearchParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -64,7 +63,7 @@ public class EmployeeController {
     @ApiOperation("Получить список сотрудников")
     @GetMapping("list")
     public List<EmployeeDto> getAll(SearchParamsDto searchParamsDto) {
-        return employeeService.getAll(new SearchParams(searchParamsDto.getName(), searchParamsDto.getPostId()))
+        return employeeService.getAll(employeeMapper.toParams(searchParamsDto))
                               .stream()
                               .map(employeeMapper::toDTO)
                               .collect(Collectors.toList());
