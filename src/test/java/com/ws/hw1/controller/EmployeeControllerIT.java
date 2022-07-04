@@ -7,10 +7,10 @@ import com.ws.hw1.controller.employee.dto.EmployeeDto;
 import com.ws.hw1.controller.employee.dto.UpdateEmployeeDto;
 import com.ws.hw1.controller.post.dto.PostDto;
 import com.ws.hw1.exceptionhandler.ErrorDto;
-import com.ws.hw1.exceptionhandler.exception.NotFoundException;
 import com.ws.hw1.model.Employee;
 import com.ws.hw1.model.JobType;
-import com.ws.hw1.model.Post;
+import com.ws.hw1.service.argument.CreateEmployeeArgument;
+import com.ws.hw1.service.argument.CreatePostArgument;
 import com.ws.hw1.service.employee.EmployeeService;
 import com.ws.hw1.service.employee.SearchParams;
 import com.ws.hw1.service.post.PostService;
@@ -20,55 +20,70 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @AutoConfigureWebTestClient
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class EmployeeControllerIT {
-    private final List<Employee> employees = new ArrayList<>();
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private WebTestClient webTestClient;
-    @SpyBean
+    @Autowired
     private EmployeeService employeeService;
-    @SpyBean
+    @Autowired
     private PostService postService;
 
     @BeforeEach
     void setUpEmployees() throws IOException {
-        Employee[] employees1 = objectMapper.readValue(new File(EmployeeControllerIT.class
-                        .getClassLoader()
-                        .getResource("employees.json")
-                        .getFile()),
-                Employee[].class);
+        CreatePostArgument argument = CreatePostArgument.builder()
+                                                        .name("Tech Writer")
+                                                        .build();
+        postService.create(argument);
 
-        employees.addAll(List.of(employees1));
+        CreateEmployeeArgument employee = objectMapper.readValue(new File(Objects.requireNonNull(EmployeeControllerIT.class
+                                                                                         .getClassLoader()
+                                                                                         .getResource("employee.json"))
+                                                                                 .getFile()),
+                CreateEmployeeArgument.class);
+
+        employeeService.create(employee);
+    }
+
+    private Employee getFirst() {
+        return employeeService.getAll(new SearchParams(null, null)).get(0);
+    }
+
+    private UUID getPostId() {
+        return postService.getAll().get(0).getId();
     }
 
     @Test
     void create() throws IOException {
         //Arrange
-        Employee employee = employees.get(0);
-
-        Post post = employee.getPost();
-
-        doReturn(post).when(postService).getExisting(any());
+        EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c5-b0b1-4a33-ae68-4d0d5feab2d6"),
+                "Геннадий",
+                "Кузьмин",
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit \namet dictum felis, eu fringilla eros. Sed et gravida neque. Nullam at egestas \nerat. Mauris vitae convallis nulla. Aenean condimentum lectus magna. \nSuspendisse viverra quam non ante pellentesque, a euismod nunc dapibus. Duis \nsed congue erat",
+                List.of("honest", "introvert", "like criticism", "love of learning", "pragmatism"),
+                new PostDto(UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707"), "Tech Writer"),
+                new ContactsDto("+79247521321", "personalEmail@gmail.com", "workEmail@ya.ru"),
+                JobType.FULL_TIME);
 
         CreateEmployeeDto createEmployeeDto = objectMapper.readValue(new File(Objects.requireNonNull(EmployeeControllerIT.class
                                                                                              .getClassLoader()
                                                                                              .getResource("create_employee_dto.json"))
                                                                                      .getFile()),
                 CreateEmployeeDto.class);
-
-        doReturn(employee).when(employeeService).create(any());
+        createEmployeeDto.setPostId(getPostId());
 
         //Act
         EmployeeDto actual = webTestClient.post()
@@ -83,6 +98,16 @@ class EmployeeControllerIT {
                                           .returnResult()
                                           .getResponseBody();
 
+        Assertions.assertNotNull(actual.getId());
+        assertThat(actual).usingRecursiveComparison()
+                          .ignoringFields("id", "post.id")
+                          .isEqualTo(expected);
+
+    }
+
+    @Test
+    void get() {
+        //Arrange
         EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c5-b0b1-4a33-ae68-4d0d5feab2d6"),
                 "Геннадий",
                 "Кузьмин",
@@ -92,18 +117,8 @@ class EmployeeControllerIT {
                 new ContactsDto("+79247521321", "personalEmail@gmail.com", "workEmail@ya.ru"),
                 JobType.FULL_TIME);
 
-        verify(employeeService).create(any());
-        Assertions.assertEquals(expected, actual);
-
-    }
-
-    @Test
-    void get() {
-        //Arrange
-        Employee employee = employees.get(0);
+        Employee employee = getFirst();
         UUID id = employee.getId();
-
-        doReturn(employee).when(employeeService).getExisting(any());
 
         //Act
         EmployeeDto actual = webTestClient.get()
@@ -116,24 +131,15 @@ class EmployeeControllerIT {
                                           .returnResult()
                                           .getResponseBody();
 
-        EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c5-b0b1-4a33-ae68-4d0d5feab2d6"),
-                "Геннадий",
-                "Кузьмин",
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit \namet dictum felis, eu fringilla eros. Sed et gravida neque. Nullam at egestas \nerat. Mauris vitae convallis nulla. Aenean condimentum lectus magna. \nSuspendisse viverra quam non ante pellentesque, a euismod nunc dapibus. Duis \nsed congue erat",
-                List.of("honest", "introvert", "like criticism", "love of learning", "pragmatism"),
-                new PostDto(UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707"), "Tech Writer"),
-                new ContactsDto("+79247521321", "personalEmail@gmail.com", "workEmail@ya.ru"),
-                JobType.FULL_TIME);
-
-        verify(employeeService).getExisting(id);
-        Assertions.assertEquals(expected, actual);
+        assertThat(actual).usingRecursiveComparison()
+                          .ignoringFields("id", "post.id")
+                          .isEqualTo(expected);
     }
 
     @Test
     void tryGetAndGetNotFound() {
         //Arrange
         UUID id = UUID.randomUUID();
-        doThrow(new NotFoundException("The employee not found")).when(employeeService).getExisting(id);
 
         ErrorDto errorDto = ErrorDto.builder()
                                     .message("The employee not found")
@@ -151,32 +157,25 @@ class EmployeeControllerIT {
     }
 
     @Test
-    void update() {
+    void update() throws IOException {
         //Arrange
-        Employee employee = employees.get(0);
-        Employee excepted = employees.get(2);
+        EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c4-b0b1-4a33-ae68-4d0d5feab2d6"),
+                "Павел",
+                "Кузьмин",
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit \namet dictum felis, eu fringilla eros. Sed et gravida neque. Nullam at egestas \nerat. Mauris vitae convallis nulla. Aenean condimentum lectus magna. \nSuspendisse viverra quam non ante pellentesque, a euismod nunc dapibus. Duis \nsed congue erat",
+                List.of("honest", "introvert", "like criticism", "love of learning", "pragmatism"),
+                new PostDto(UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707"), "Tech Writer"),
+                new ContactsDto("+79247521321", "personalEmail@gmail.com", "workEmail@ya.ru"),
+                JobType.FULL_TIME);
 
-        ContactsDto contactsDto = ContactsDto.builder()
-                                             .phone(employee.getContacts().getPhone())
-                                             .email(employee.getContacts().getEmail())
-                                             .workEmail(employee.getContacts().getWorkEmail())
-                                             .build();
+        UpdateEmployeeDto updateEmployeeDto = objectMapper.readValue(new File(Objects.requireNonNull(EmployeeControllerIT.class
+                                                                                             .getClassLoader()
+                                                                                             .getResource("update_employee_dto.json"))
+                                                                                     .getFile()),
+                UpdateEmployeeDto.class);
+        updateEmployeeDto.setPostId(getPostId());
+        UUID id = getFirst().getId();
 
-        UpdateEmployeeDto updateEmployeeDto = UpdateEmployeeDto.builder()
-                                                               .firstName("Павел")
-                                                               .lastName(employee.getLastName())
-                                                               .description(employee.getDescription())
-                                                               .characteristics(employee.getCharacteristics())
-                                                               .postId(employee.getPost().getId())
-                                                               .contacts(contactsDto)
-                                                               .jobType(employee.getJobType())
-                                                               .build();
-        UUID id = employee.getId();
-
-        Post post = employee.getPost();
-
-        doReturn(post).when(postService).getExisting(any());
-        doReturn(excepted).when(employeeService).update(any(), any());
 
         //Act
         EmployeeDto actual = webTestClient.put()
@@ -190,42 +189,20 @@ class EmployeeControllerIT {
                                           .returnResult()
                                           .getResponseBody();
 
-        EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c4-b0b1-4a33-ae68-4d0d5feab2d6"),
-                "Павел",
-                "Кузьмин",
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit \namet dictum felis, eu fringilla eros. Sed et gravida neque. Nullam at egestas \nerat. Mauris vitae convallis nulla. Aenean condimentum lectus magna. \nSuspendisse viverra quam non ante pellentesque, a euismod nunc dapibus. Duis \nsed congue erat",
-                List.of("honest", "introvert", "like criticism", "love of learning", "pragmatism"),
-                new PostDto(UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707"), "Tech Writer"),
-                new ContactsDto("+79247521321", "personalEmail@gmail.com", "workEmail@ya.ru"),
-                JobType.FULL_TIME);
-
-        verify(postService).getExisting(post.getId());
-        Assertions.assertEquals(expected, actual);
+        assertThat(actual).usingRecursiveComparison()
+                          .ignoringFields("id", "post.id", "")
+                          .isEqualTo(expected);
     }
 
     @Test
-    void tryUpdateAndGetNotFound() {
+    void tryUpdateAndGetNotFound() throws IOException {
         //Arrange
-        Employee employee = employees.get(0);
-
-        ContactsDto contactsDto = ContactsDto.builder()
-                                             .phone(employee.getContacts().getPhone())
-                                             .email(employee.getContacts().getEmail())
-                                             .workEmail(employee.getContacts().getWorkEmail())
-                                             .build();
-
-        UpdateEmployeeDto employeeDto = UpdateEmployeeDto.builder()
-                                                         .firstName(employee.getFirstName())
-                                                         .lastName(employee.getLastName())
-                                                         .description(employee.getDescription())
-                                                         .characteristics(employee.getCharacteristics())
-                                                         .postId(employee.getPost().getId())
-                                                         .contacts(contactsDto)
-                                                         .jobType(employee.getJobType())
-                                                         .build();
-
+        UpdateEmployeeDto employeeDto = objectMapper.readValue(new File(Objects.requireNonNull(EmployeeControllerIT.class
+                                                                                       .getClassLoader()
+                                                                                       .getResource("update_employee_dto.json"))
+                                                                               .getFile()),
+                UpdateEmployeeDto.class);
         UUID id = UUID.randomUUID();
-        doThrow(NotFoundException.class).when(employeeService).update(any(), any());
 
         ErrorDto errorDto = ErrorDto.builder()
                                     .message("The post not found")
@@ -246,22 +223,6 @@ class EmployeeControllerIT {
     @Test
     void getAll() {
         //Arrange
-        List<Employee> employee = List.of(employees.get(0), employees.get(1));
-
-        doReturn(employee).when(employeeService).getAll(any());
-
-        //Act
-        List<EmployeeDto> actual = webTestClient.get()
-                                                .uri(uriBuilder -> uriBuilder.path("employee/list")
-                                                                             .build())
-                                                .exchange()
-                                                //Arrange
-                                                .expectStatus()
-                                                .isOk()
-                                                .expectBodyList(EmployeeDto.class)
-                                                .returnResult()
-                                                .getResponseBody();
-
         EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c5-b0b1-4a33-ae68-4d0d5feab2d6"),
                 "Геннадий",
                 "Кузьмин",
@@ -271,32 +232,9 @@ class EmployeeControllerIT {
                 new ContactsDto("+79247521321", "personalEmail@gmail.com", "workEmail@ya.ru"),
                 JobType.FULL_TIME);
 
-        EmployeeDto expected1 = new EmployeeDto(UUID.fromString("720eb7c5-b0b1-4a33-ae68-4d0d5feab2d5"),
-                "Ivan",
-                "Ivanov",
-                "",
-                List.of("active", "cynical", "hard-working", "enthusiastic"),
-                new PostDto(UUID.fromString("762d15a5-3bc9-43ef-ae96-02a680a557d0"), "Lead Developer"),
-                new ContactsDto("+79247121321", "firstEmail@mail.ru", "secondEmail@gmail.com"),
-                JobType.CONTRACT);
-
-
-        verify(employeeService).getAll(new SearchParams(null, null));
-        Assertions.assertEquals(expected, actual.get(0));
-        Assertions.assertEquals(expected1, actual.get(1));
-    }
-
-    @Test
-    void getAllFilterByFirstName() {
-        //Arrange
-        List<Employee> employee = List.of(employees.get(2));
-
-        doReturn(employee).when(employeeService).getAll(any());
-
         //Act
         List<EmployeeDto> actual = webTestClient.get()
                                                 .uri(uriBuilder -> uriBuilder.path("employee/list")
-                                                                             .queryParam("name", "Павел")
                                                                              .build())
                                                 .exchange()
                                                 //Arrange
@@ -306,8 +244,16 @@ class EmployeeControllerIT {
                                                 .returnResult()
                                                 .getResponseBody();
 
-        EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c4-b0b1-4a33-ae68-4d0d5feab2d6"),
-                "Павел",
+        assertThat(actual.get(0)).usingRecursiveComparison()
+                          .ignoringFields("id", "post.id")
+                          .isEqualTo(expected);
+    }
+
+    @Test
+    void getAllFilterByFirstName() {
+        //Arrange
+        EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c5-b0b1-4a33-ae68-4d0d5feab2d6"),
+                "Геннадий",
                 "Кузьмин",
                 "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit \namet dictum felis, eu fringilla eros. Sed et gravida neque. Nullam at egestas \nerat. Mauris vitae convallis nulla. Aenean condimentum lectus magna. \nSuspendisse viverra quam non ante pellentesque, a euismod nunc dapibus. Duis \nsed congue erat",
                 List.of("honest", "introvert", "like criticism", "love of learning", "pragmatism"),
@@ -315,16 +261,35 @@ class EmployeeControllerIT {
                 new ContactsDto("+79247521321", "personalEmail@gmail.com", "workEmail@ya.ru"),
                 JobType.FULL_TIME);
 
-        verify(employeeService).getAll(new SearchParams("Павел", null));
-        Assertions.assertEquals(expected, actual.get(0));
+        //Act
+        List<EmployeeDto> actual = webTestClient.get()
+                                                .uri(uriBuilder -> uriBuilder.path("employee/list")
+                                                                             .queryParam("name", "Геннадий")
+                                                                             .build())
+                                                .exchange()
+                                                //Arrange
+                                                .expectStatus()
+                                                .isOk()
+                                                .expectBodyList(EmployeeDto.class)
+                                                .returnResult()
+                                                .getResponseBody();
+
+        assertThat(actual.get(0)).usingRecursiveComparison()
+                          .ignoringFields("id", "post.id")
+                          .isEqualTo(expected);
     }
 
     @Test
     void getAllFilterByLastName() {
         //Arrange
-        List<Employee> employee = List.of(employees.get(2));
-
-        doReturn(employee).when(employeeService).getAll(any());
+        EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c4-b0b1-4a33-ae68-4d0d5feab2d6"),
+                "Геннадий",
+                "Кузьмин",
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit \namet dictum felis, eu fringilla eros. Sed et gravida neque. Nullam at egestas \nerat. Mauris vitae convallis nulla. Aenean condimentum lectus magna. \nSuspendisse viverra quam non ante pellentesque, a euismod nunc dapibus. Duis \nsed congue erat",
+                List.of("honest", "introvert", "like criticism", "love of learning", "pragmatism"),
+                new PostDto(UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707"), "Tech Writer"),
+                new ContactsDto("+79247521321", "personalEmail@gmail.com", "workEmail@ya.ru"),
+                JobType.FULL_TIME);
 
         //Act
         List<EmployeeDto> actual = webTestClient.get()
@@ -339,59 +304,14 @@ class EmployeeControllerIT {
                                                 .returnResult()
                                                 .getResponseBody();
 
-        EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c4-b0b1-4a33-ae68-4d0d5feab2d6"),
-                "Павел",
-                "Кузьмин",
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit \namet dictum felis, eu fringilla eros. Sed et gravida neque. Nullam at egestas \nerat. Mauris vitae convallis nulla. Aenean condimentum lectus magna. \nSuspendisse viverra quam non ante pellentesque, a euismod nunc dapibus. Duis \nsed congue erat",
-                List.of("honest", "introvert", "like criticism", "love of learning", "pragmatism"),
-                new PostDto(UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707"), "Tech Writer"),
-                new ContactsDto("+79247521321", "personalEmail@gmail.com", "workEmail@ya.ru"),
-                JobType.FULL_TIME);
-
-        verify(employeeService).getAll(new SearchParams("Кузьмин", null));
-        Assertions.assertEquals(expected, actual.get(0));
-    }
-
-    @Test
-    void getAllFilterByPostId() {
-        //Arrange
-        List<Employee> employee = List.of(employees.get(1));
-
-        doReturn(employee).when(employeeService).getAll(any());
-
-        //Act
-        List<EmployeeDto> actual = webTestClient.get()
-                                                .uri(uriBuilder -> uriBuilder.path("employee/list")
-                                                                             .queryParam("postId", "762d15a5-3bc9-43ef-ae96-02a680a557d0")
-                                                                             .build())
-                                                .exchange()
-                                                //Arrange
-                                                .expectStatus()
-                                                .isOk()
-                                                .expectBodyList(EmployeeDto.class)
-                                                .returnResult()
-                                                .getResponseBody();
-
-
-        EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c5-b0b1-4a33-ae68-4d0d5feab2d5"),
-                "Ivan",
-                "Ivanov",
-                "",
-                List.of("active", "cynical", "hard-working", "enthusiastic"),
-                new PostDto(UUID.fromString("762d15a5-3bc9-43ef-ae96-02a680a557d0"), "Lead Developer"),
-                new ContactsDto("+79247121321", "firstEmail@mail.ru", "secondEmail@gmail.com"),
-                JobType.CONTRACT);
-
-        verify(employeeService).getAll(new SearchParams(null, UUID.fromString("762d15a5-3bc9-43ef-ae96-02a680a557d0")));
-        Assertions.assertEquals(expected, actual.get(0));
+        assertThat(actual.get(0)).usingRecursiveComparison()
+                          .ignoringFields("id", "post.id")
+                          .isEqualTo(expected);
     }
 
     @Test
     void getAllIncorrectFilter() {
         //Arrange
-        List<Employee> employee = Collections.EMPTY_LIST;
-
-        doReturn(employee).when(employeeService).getAll(any());
 
         //Act
         List<EmployeeDto> employeeDto = webTestClient.get()
@@ -406,16 +326,20 @@ class EmployeeControllerIT {
                                                      .returnResult()
                                                      .getResponseBody();
 
-        verify(employeeService).getAll(new SearchParams(null, UUID.fromString("762d15a5-3bc9-43ef-ae96-02a680a557d1")));
         Assertions.assertEquals(0, employeeDto.size());
     }
 
     @Test
     void getAllFilterByNameAndPostId() {
         //Arrange
-        List<Employee> employee = List.of(employees.get(0));
-
-        doReturn(employee).when(employeeService).getAll(any());
+        EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c5-b0b1-4a33-ae68-4d0d5feab2d6"),
+                "Геннадий",
+                "Кузьмин",
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit \namet dictum felis, eu fringilla eros. Sed et gravida neque. Nullam at egestas \nerat. Mauris vitae convallis nulla. Aenean condimentum lectus magna. \nSuspendisse viverra quam non ante pellentesque, a euismod nunc dapibus. Duis \nsed congue erat",
+                List.of("honest", "introvert", "like criticism", "love of learning", "pragmatism"),
+                new PostDto(UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707"), "Tech Writer"),
+                new ContactsDto("+79247521321", "personalEmail@gmail.com", "workEmail@ya.ru"),
+                JobType.FULL_TIME);
 
         //Act
         List<EmployeeDto> actual = webTestClient.get()
@@ -431,17 +355,8 @@ class EmployeeControllerIT {
                                                 .returnResult()
                                                 .getResponseBody();
 
-        EmployeeDto expected = new EmployeeDto(UUID.fromString("720eb7c5-b0b1-4a33-ae68-4d0d5feab2d6"),
-                "Геннадий",
-                "Кузьмин",
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit \namet dictum felis, eu fringilla eros. Sed et gravida neque. Nullam at egestas \nerat. Mauris vitae convallis nulla. Aenean condimentum lectus magna. \nSuspendisse viverra quam non ante pellentesque, a euismod nunc dapibus. Duis \nsed congue erat",
-                List.of("honest", "introvert", "like criticism", "love of learning", "pragmatism"),
-                new PostDto(UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707"), "Tech Writer"),
-                new ContactsDto("+79247521321", "personalEmail@gmail.com", "workEmail@ya.ru"),
-                JobType.FULL_TIME);
-
-        verify(employeeService).getAll(new SearchParams("Кузьмин", UUID.fromString("854ef89d-6c27-4635-926d-894d76a81707")));
-        Assertions.assertEquals(expected, actual.get(0));
+        assertThat(actual.get(0)).usingRecursiveComparison()
+                          .ignoringFields("id", "post.id")
+                          .isEqualTo(expected);
     }
-
 }

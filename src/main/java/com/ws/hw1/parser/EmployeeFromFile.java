@@ -2,6 +2,7 @@ package com.ws.hw1.parser;
 
 import lombok.*;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @AllArgsConstructor
@@ -11,13 +12,13 @@ import java.util.List;
 @ToString
 @Builder
 public class EmployeeFromFile {
-    @NonNull
+    @NotNull
     private String firstName;
-    @NonNull
+    @NotNull
     private String lastName;
     private String description;
-    @NonNull
+    @NotNull
     private List<String> characteristics;
-    @NonNull
+    @NotNull
     private String postId;
 }

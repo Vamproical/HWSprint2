@@ -4,22 +4,20 @@ import com.ws.hw1.controller.post.dto.CreatePostDto;
 import com.ws.hw1.controller.post.dto.PostDto;
 import com.ws.hw1.controller.post.dto.UpdatePostDto;
 import com.ws.hw1.exceptionhandler.ErrorDto;
-import com.ws.hw1.exceptionhandler.exception.NotFoundException;
 import com.ws.hw1.model.Post;
 import com.ws.hw1.service.argument.CreatePostArgument;
 import com.ws.hw1.service.post.PostService;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @AutoConfigureWebTestClient
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -29,18 +27,25 @@ class PostControllerIT {
     private final CreatePostArgument postArgument = CreatePostArgument.builder()
                                                                       .name("Tech Writer")
                                                                       .build();
-    private final UUID id = UUID.fromString("720eb7c5-b0b1-4a33-ae68-4d0d5feab2d6");
-    private final Post post = new Post(id, "Tech Writer");
-    private final Post updatedPost = new Post(id, "Lead Developer");
     @Autowired
     private WebTestClient webTestClient;
-    @SpyBean
+    @Autowired
     private PostService postService;
+
+    @BeforeEach
+    void setUpPost() {
+        postService.create(postArgument);
+    }
+
+    private Post getFirst() {
+        return postService.getAll().get(0);
+    }
 
     @Test
     void create() {
         //Arrange
-        when(postService.create(postArgument)).thenReturn(post);
+        UUID id = UUID.randomUUID();
+        PostDto expected = new PostDto(id, "Tech Writer");
 
         //Act
         PostDto actual = webTestClient.post()
@@ -55,20 +60,20 @@ class PostControllerIT {
                                       .returnResult()
                                       .getResponseBody();
 
-        PostDto expected = new PostDto(id, "Tech Writer");
-
-        verify(postService).create(postArgument);
-        Assertions.assertEquals(expected, actual);
+        Assertions.assertNotNull(actual.getId());
+        assertThat(actual).usingRecursiveComparison().ignoringFields("id").isEqualTo(expected);
     }
 
     @Test
     void get() {
         //Arrange
-        doReturn(post).when(postService).getExisting(any());
+        Post post1 = getFirst();
+        UUID getId = post1.getId();
+        PostDto expected = new PostDto(getId, "Tech Writer");
 
         //Act
         PostDto actual = webTestClient.get()
-                                      .uri("post/{id}", id)
+                                      .uri("post/{id}", getId)
                                       .exchange()
                                       //Arrange
                                       .expectStatus()
@@ -77,9 +82,6 @@ class PostControllerIT {
                                       .returnResult()
                                       .getResponseBody();
 
-        PostDto expected = new PostDto(id, "Tech Writer");
-
-        verify(postService).getExisting(id);
         Assertions.assertEquals(expected, actual);
     }
 
@@ -87,8 +89,6 @@ class PostControllerIT {
     void tryGetAndGetNotFound() {
         //Arrange
         UUID id = UUID.randomUUID();
-        doThrow(new NotFoundException("The post not found")).when(postService).getExisting(id);
-
         ErrorDto errorDto = ErrorDto.builder()
                                     .message("The post not found")
                                     .build();
@@ -107,7 +107,9 @@ class PostControllerIT {
     @Test
     void update() {
         //Assert
-        doReturn(updatedPost).when(postService).update(any(), any());
+        Post post = getFirst();
+        UUID id = post.getId();
+        PostDto expected = new PostDto(id, "Lead Developer");
 
         //Act
         PostDto actual = webTestClient.put()
@@ -121,17 +123,13 @@ class PostControllerIT {
                                       .returnResult()
                                       .getResponseBody();
 
-        PostDto expected = new PostDto(id, "Lead Developer");
-
-        verify(postService).update(id, updateDto);
         Assertions.assertEquals(expected, actual);
     }
 
     @Test
     void tryUpdateAndGetNotFound() {
         //Assert
-        doThrow(new NotFoundException("The post not found")).when(postService).update(any(), any());
-
+        UUID id = UUID.randomUUID();
         ErrorDto errorDto = ErrorDto.builder()
                                     .message("The post not found")
                                     .build();

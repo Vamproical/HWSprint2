@@ -3,12 +3,16 @@ package com.ws.hw1.service.argument;
 import com.ws.hw1.model.Contacts;
 import com.ws.hw1.model.JobType;
 import com.ws.hw1.model.Post;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class CreateEmployeeArgument {
     String firstName;

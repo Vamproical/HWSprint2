@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Pattern;
 
 @Data
@@ -14,8 +15,8 @@ import javax.validation.constraints.Pattern;
 public class ContactsDto {
     @Pattern(regexp = "(^$|\\d{10})")
     private String phone;
-    @Pattern(regexp = "^(.+)@(\\S+)$")
+    @Email
     private String email;
-    @Pattern(regexp = "^(.+)@(\\S+)$")
+    @Email
     private String workEmail;
 }
