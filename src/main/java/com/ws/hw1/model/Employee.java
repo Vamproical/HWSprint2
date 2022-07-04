@@ -1,23 +1,26 @@
 package com.ws.hw1.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
-@Getter
-@Setter
-@EqualsAndHashCode
-@ToString
+@NoArgsConstructor
+@Data
 @Builder
+@Jacksonized
 public class Employee {
-    @NonNull
+    private UUID id;
     private String firstName;
-    @NonNull
     private String lastName;
     private String description;
-    @NonNull
     private List<String> characteristics;
-    @NonNull
     private Post post;
+    private Contacts contacts;
+    private JobType jobType;
 }

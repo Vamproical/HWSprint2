@@ -1,16 +1,16 @@
 package com.ws.hw1.model;
 
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Builder;
+import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 
 import java.util.UUID;
 
 @AllArgsConstructor
-@Getter
-@Setter
-@EqualsAndHashCode
+@Data
+@Builder
+@Jacksonized
 public class Post {
     private UUID id;
     private String name;
