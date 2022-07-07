@@ -1,26 +1,53 @@
 package com.ws.hw1.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.jackson.Jacksonized;
+import org.hibernate.Hibernate;
+import org.hibernate.annotations.GenericGenerator;
 
+import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @Jacksonized
+@Entity
 public class Employee {
-    private UUID id;
-    private String firstName;
-    private String lastName;
-    private String description;
-    private List<String> characteristics;
-    private Post post;
-    private Contacts contacts;
-    private JobType jobType;
+    @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    UUID id;
+    String firstName;
+    String lastName;
+    String description;
+    @ElementCollection
+    List<String> characteristics;
+    @OneToOne
+    @JoinColumn(name = "post_id")
+    Post post;
+    @Embedded
+    Contacts contacts;
+    JobType jobType;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Employee employee = (Employee) o;
+        return id != null && Objects.equals(id, employee.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }
