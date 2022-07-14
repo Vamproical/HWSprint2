@@ -49,6 +49,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -75,6 +81,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.jupiter-tools</groupId>
+            <artifactId>spring-test-postgres</artifactId>
+            <version>0.4</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>31.1-jre</version>
@@ -98,6 +110,7 @@
             <version>42.4.0</version>
             <scope>runtime</scope>
         </dependency>
+
     </dependencies>
 
     <build>

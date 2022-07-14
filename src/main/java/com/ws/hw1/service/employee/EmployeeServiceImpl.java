@@ -39,6 +39,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee update(@NonNull UUID id, @NonNull UpdateEmployeeArgument employeeArgument) {
         Employee employee = getExisting(id);
+
         employee.setFirstName(employeeArgument.getFirstName());
         employee.setLastName(employeeArgument.getLastName());
         employee.setDescription(employeeArgument.getDescription());
@@ -77,7 +78,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         if (params.getName() != null) {
             predicate = predicate.and(employee -> employee.getFirstName().toLowerCase().contains(params.getName().toLowerCase()) ||
-                    employee.getLastName().toLowerCase().contains(params.getName().toLowerCase()));
+                                                  employee.getLastName().toLowerCase().contains(params.getName().toLowerCase()));
         }
 
         if (params.getPostId() != null) {

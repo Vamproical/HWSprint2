@@ -1,5 +1,8 @@
 package com.ws.hw1.controller;
 
+import com.github.database.rider.core.api.dataset.DataSet;
+import com.github.database.rider.core.api.dataset.ExpectedDataSet;
+import com.jupiter.tools.spring.test.postgres.annotation.meta.EnablePostgresIntegrationTest;
 import com.ws.hw1.controller.post.dto.CreatePostDto;
 import com.ws.hw1.controller.post.dto.PostDto;
 import com.ws.hw1.controller.post.dto.UpdatePostDto;
@@ -21,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @AutoConfigureWebTestClient
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@EnablePostgresIntegrationTest
 class PostControllerIT {
     private final CreatePostDto createDto = new CreatePostDto("Tech Writer");
     private final UpdatePostDto updateDto = new UpdatePostDto("Lead Developer");
@@ -42,10 +46,11 @@ class PostControllerIT {
     }
 
     @Test
+    @DataSet(cleanBefore = true, cleanAfter = true, value = "post/dataset/create.json")
+    @ExpectedDataSet("post/expectedDataset/expected_create.json")
     void create() {
         //Arrange
         UUID id = UUID.randomUUID();
-        PostDto expected = new PostDto(id, "Tech Writer");
 
         //Act
         PostDto actual = webTestClient.post()
@@ -60,6 +65,8 @@ class PostControllerIT {
                                       .returnResult()
                                       .getResponseBody();
 
+        PostDto expected = new PostDto(id, "Tech Writer");
+
         Assertions.assertNotNull(actual.getId());
         assertThat(actual).usingRecursiveComparison().ignoringFields("id").isEqualTo(expected);
     }
@@ -69,18 +76,19 @@ class PostControllerIT {
         //Arrange
         Post post1 = getFirst();
         UUID getId = post1.getId();
-        PostDto expected = new PostDto(getId, "Tech Writer");
 
         //Act
         PostDto actual = webTestClient.get()
                                       .uri("post/{id}", getId)
                                       .exchange()
-                                      //Arrange
+                                      //Assert
                                       .expectStatus()
                                       .isOk()
                                       .expectBody(PostDto.class)
                                       .returnResult()
                                       .getResponseBody();
+
+        PostDto expected = new PostDto(getId, "Tech Writer");
 
         Assertions.assertEquals(expected, actual);
     }
@@ -97,7 +105,7 @@ class PostControllerIT {
         webTestClient.get()
                      .uri("post/{id}", id)
                      .exchange()
-                     //Arrange
+                     //Assert
                      .expectStatus()
                      .isNotFound()
                      .expectBody(ErrorDto.class)
@@ -106,29 +114,30 @@ class PostControllerIT {
 
     @Test
     void update() {
-        //Assert
+        //Arrange
         Post post = getFirst();
         UUID id = post.getId();
-        PostDto expected = new PostDto(id, "Lead Developer");
 
         //Act
         PostDto actual = webTestClient.put()
                                       .uri("post/{id}/update", id)
                                       .bodyValue(updateDto)
                                       .exchange()
-                                      //Arrange
+                                      //Assert
                                       .expectStatus()
                                       .isOk()
                                       .expectBody(PostDto.class)
                                       .returnResult()
                                       .getResponseBody();
 
+        PostDto expected = new PostDto(id, "Lead Developer");
+
         Assertions.assertEquals(expected, actual);
     }
 
     @Test
     void tryUpdateAndGetNotFound() {
-        //Assert
+        //Arrange
         UUID id = UUID.randomUUID();
         ErrorDto errorDto = ErrorDto.builder()
                                     .message("The post not found")
@@ -139,7 +148,7 @@ class PostControllerIT {
                      .uri("post/{id}/update", id)
                      .bodyValue(updateDto)
                      .exchange()
-                     //Arrange
+                     //Assert
                      .expectStatus()
                      .isNotFound()
                      .expectBody(ErrorDto.class)

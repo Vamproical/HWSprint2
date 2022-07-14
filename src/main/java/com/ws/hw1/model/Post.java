@@ -4,6 +4,10 @@ import lombok.*;
 import lombok.extern.jackson.Jacksonized;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
+import org.testcontainers.shaded.org.apache.commons.lang3.builder.DiffBuilder;
+import org.testcontainers.shaded.org.apache.commons.lang3.builder.DiffResult;
+import org.testcontainers.shaded.org.apache.commons.lang3.builder.Diffable;
+import org.testcontainers.shaded.org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,7 +23,7 @@ import java.util.UUID;
 @ToString
 @Builder
 @Jacksonized
-public class Post {
+public class Post implements Diffable<Post> {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
@@ -40,5 +44,14 @@ public class Post {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+
+    @Override
+    public DiffResult<Post> diff(Post post) {
+        DiffBuilder<Post> diffBuilder = new DiffBuilder<>(this, post, ToStringStyle.JSON_STYLE);
+
+        diffBuilder.append("name", this.name, post.name);
+
+        return diffBuilder.build();
     }
 }

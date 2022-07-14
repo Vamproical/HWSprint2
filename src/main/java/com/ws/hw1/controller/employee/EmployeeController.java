@@ -34,7 +34,7 @@ public class EmployeeController {
     @ApiOperation("Добавить нового сотрудника")
     @PostMapping("create")
     @ResponseStatus(code = HttpStatus.CREATED)
-    public EmployeeDto createEmployee(@RequestBody @Valid CreateEmployeeDto employeeDto) {
+    public EmployeeDto create(@RequestBody @Valid CreateEmployeeDto employeeDto) {
         CreateEmployeeArgument employeeArgument = createEmployeeArgumentAction.execute(employeeDto);
         Employee newEmployee = employeeService.create(employeeArgument);
         return employeeMapper.toDTO(newEmployee);
@@ -42,7 +42,7 @@ public class EmployeeController {
 
     @ApiOperation("Обновить характеристики сотрудника")
     @PutMapping("{id}/update")
-    public EmployeeDto updateEmployee(@PathVariable UUID id, @RequestBody @Valid UpdateEmployeeDto employeeDto) throws NotFoundException {
+    public EmployeeDto update(@PathVariable UUID id, @RequestBody @Valid UpdateEmployeeDto employeeDto) throws NotFoundException {
         UpdateEmployeeArgument employeeArgument = updateEmployeeArgumentAction.execute(employeeDto);
         Employee updatedPost = employeeService.update(id, employeeArgument);
         return employeeMapper.toDTO(updatedPost);
@@ -50,7 +50,7 @@ public class EmployeeController {
 
     @ApiOperation("Удалить сотрудника")
     @DeleteMapping("{id}/delete")
-    public void deleteEmployee(@PathVariable UUID id) throws NotFoundException {
+    public void delete(@PathVariable UUID id) throws NotFoundException {
         employeeService.delete(id);
     }
 
