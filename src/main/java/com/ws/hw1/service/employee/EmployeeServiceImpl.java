@@ -53,6 +53,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void delete(@NonNull UUID id) {
+        getExisting(id);
         repository.deleteById(id);
     }
 

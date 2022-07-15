@@ -41,6 +41,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void delete(@NonNull UUID id) {
+        getExisting(id);
         postRepository.deleteById(id);
     }
 

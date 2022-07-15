@@ -35,7 +35,8 @@ public class Employee implements Diffable<Employee> {
     @Column(length = 1024)
     String description;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "employee_characteristics", joinColumns = @JoinColumn(name = "employee_id"))
     List<String> characteristics;
 
     @OneToOne
