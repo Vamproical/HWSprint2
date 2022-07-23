@@ -1,25 +1,31 @@
 package com.ws.hw1.service.employee;
 
+import com.querydsl.jpa.impl.JPAQuery;
+import com.ws.hw1.action.CreateJpaQueryAction;
+import com.ws.hw1.exceptionhandler.exception.NotFoundException;
 import com.ws.hw1.model.Employee;
+import com.ws.hw1.model.QEmployee;
+import com.ws.hw1.repository.EmployeeRepository;
 import com.ws.hw1.service.argument.CreateEmployeeArgument;
 import com.ws.hw1.service.argument.UpdateEmployeeArgument;
-import com.ws.hw1.utils.Guard;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
-    private final Map<UUID, Employee> employees = new HashMap<>();
+    private final EmployeeRepository repository;
+    private final CreateJpaQueryAction jpaQueryAction;
+
 
     @Override
     public Employee create(@NonNull CreateEmployeeArgument employeeArgument) {
-        UUID id = UUID.randomUUID();
         Employee employee = Employee.builder()
-                                    .id(id)
                                     .firstName(employeeArgument.getFirstName())
                                     .lastName(employeeArgument.getLastName())
                                     .characteristics(employeeArgument.getCharacteristics())
@@ -29,14 +35,14 @@ public class EmployeeServiceImpl implements EmployeeService {
                                     .post(employeeArgument.getPost())
                                     .build();
 
-        employees.put(id, employee);
-
-        return employee;
+        return repository.save(employee);
     }
 
     @Override
+    @Transactional
     public Employee update(@NonNull UUID id, @NonNull UpdateEmployeeArgument employeeArgument) {
         Employee employee = getExisting(id);
+
         employee.setFirstName(employeeArgument.getFirstName());
         employee.setLastName(employeeArgument.getLastName());
         employee.setDescription(employeeArgument.getDescription());
@@ -45,47 +51,49 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setPost(employeeArgument.getPost());
         employee.setJobType(employeeArgument.getJobType());
 
-        employees.replace(id, employee);
-
-        return employee;
+        return repository.save(employee);
     }
 
     @Override
+    @Transactional
     public void delete(@NonNull UUID id) {
-        Guard.check(employees.containsKey(id), "The employee not found");
-        employees.remove(id);
+        getExisting(id);
+        repository.deleteById(id);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Employee getExisting(@NonNull UUID id) {
-        Guard.check(employees.containsKey(id), "The employee not found");
-        return employees.get(id);
+        return repository.findById(id)
+                         .orElseThrow(() -> new NotFoundException("The employee not found"));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Employee> getAll(@NonNull SearchParams params) {
-        Predicate<Employee> predicate = filter(params);
+        JPAQuery<Employee> query = jpaQueryAction.execute();
+        QEmployee employee = QEmployee.employee;
 
-        return employees.values()
-                        .stream()
-                        .filter(predicate)
-                        .sorted(Comparator.comparing(Employee::getFirstName)
-                                          .thenComparing(Employee::getLastName))
-                        .collect(Collectors.toList());
+        query.select(employee).from(employee);
+
+        filter(params, query, employee);
+
+        return query.orderBy(employee.lastName.asc(),
+                             employee.firstName.asc())
+                    .fetch();
     }
 
-    private Predicate<Employee> filter(SearchParams params) {
-        Predicate<Employee> predicate = x -> true;
-
-        if (params.getName() != null) {
-            predicate = predicate.and(employee -> employee.getFirstName().toLowerCase().contains(params.getName().toLowerCase()) ||
-                    employee.getLastName().toLowerCase().contains(params.getName().toLowerCase()));
+    private void filter(SearchParams params, JPAQuery<Employee> query, QEmployee employee) {
+        if (params.getName() != null && !params.getName().isEmpty()) {
+            query.where(
+                    employee.firstName.containsIgnoreCase(params.getName()).or(
+                            employee.lastName.containsIgnoreCase(params.getName()))
+                       );
         }
-
         if (params.getPostId() != null) {
-            predicate = predicate.and(employee -> employee.getPost().getId().equals(params.getPostId()));
+            query.where(
+                    employee.post.id.eq(params.getPostId())
+                       );
         }
-
-        return predicate;
     }
 }

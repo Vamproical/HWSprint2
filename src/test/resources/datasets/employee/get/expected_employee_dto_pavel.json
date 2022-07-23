@@ -1,0 +1,21 @@
+{
+  "id": "e8a9d19f-91dc-463a-b7ce-798a196f8cdf",
+  "firstName": "Павел",
+  "lastName": "Чичиков",
+  "description": "text text",
+  "characteristics": [
+    "pragmatism",
+    "extrovert",
+    "well with others"
+  ],
+  "post": {
+    "id": "854ef89d-6c27-4635-926d-894d76a81707",
+    "name": "Middle Developer"
+  },
+  "contacts": {
+    "phone": "+79247512123",
+    "email": "chichikov@gmail.com",
+    "workEmail": "chichikov_work@ya.ru"
+  },
+  "jobType": "PART_TIME"
+}

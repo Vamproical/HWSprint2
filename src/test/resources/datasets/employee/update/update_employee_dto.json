@@ -1,0 +1,18 @@
+{
+  "firstName": "Владислав",
+  "lastName": "Кузьмин",
+  "description": "",
+  "characteristics": [
+    "extrovert",
+    "like criticism",
+    "love of learning",
+    "pragmatism"
+  ],
+  "postId": "ebc19c4f-5bd8-4165-813f-2ac699134ad4",
+  "contacts": {
+    "phone": "+79247521123",
+    "email": "personalEmail@gmail.com",
+    "workEmail": "workingEmail@ya.ru"
+  },
+  "jobType": "PART_TIME"
+}

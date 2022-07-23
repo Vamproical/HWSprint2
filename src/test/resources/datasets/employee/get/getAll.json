@@ -1,0 +1,81 @@
+{
+  "employee": [
+    {
+      "id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+      "first_name": "Геннадий",
+      "last_name": "Кузьмин",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit \namet dictum felis, eu fringilla eros. Sed et gravida neque. Nullam at egestas \nerat. Mauris vitae convallis nulla. Aenean condimentum lectus magna. \nSuspendisse viverra quam non ante pellentesque, a euismod nunc dapibus. Duis \nsed congue erat",
+      "post_id": "ebc19c4f-5bd8-4165-813f-2ac699134ad4",
+      "phone": "+79247521321",
+      "email": "personalEmail@gmail.com",
+      "work_email": "workEmail@ya.ru",
+      "job_type": "FULL_TIME"
+    },
+    {
+      "id": "e8a9d19f-91dc-463a-b7ce-798a196f8cdf",
+      "first_name": "Павел",
+      "last_name": "Чичиков",
+      "description": "text text",
+      "post_id": "43dd5802-d810-4d7c-8d1a-3ccb4675f4f4",
+      "phone": "+79247512123",
+      "email": "chichikov@gmail.com",
+      "work_email": "chichikov_work@ya.ru",
+      "job_type": "PART_TIME"
+    },
+    {
+      "id": "bbea8e3e-64ab-4d71-a856-fb8bf46934cb",
+      "first_name": "Кристина",
+      "last_name": "Павлова",
+      "description": "some description",
+      "post_id": "58f5bf47-2766-40dd-b878-9e8635e9b2ee",
+      "phone": "+79241111111",
+      "email": "pavlova@rambler.ru",
+      "work_email": "work_pavlova@gmail.com",
+      "job_type": "CONTRACT"
+    }
+  ],
+  "employee_characteristics": [
+    {
+      "employee_id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+      "characteristics": "like criticism"
+    },
+    {
+      "employee_id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+      "characteristics": "love of learning"
+    },
+    {
+      "employee_id": "e8a9d19f-91dc-463a-b7ce-798a196f8cdf",
+      "characteristics": "pragmatism"
+    },
+    {
+      "employee_id": "e8a9d19f-91dc-463a-b7ce-798a196f8cdf",
+      "characteristics": "extrovert"
+    },
+    {
+      "employee_id": "e8a9d19f-91dc-463a-b7ce-798a196f8cdf",
+      "characteristics": "well with others"
+    },
+    {
+      "employee_id": "bbea8e3e-64ab-4d71-a856-fb8bf46934cb",
+      "characteristics": "work better alone"
+    },
+    {
+      "employee_id": "bbea8e3e-64ab-4d71-a856-fb8bf46934cb",
+      "characteristics": "honest"
+    }
+  ],
+  "post": [
+    {
+      "id": "ebc19c4f-5bd8-4165-813f-2ac699134ad4",
+      "name": "Senior Developer"
+    },
+    {
+      "id": "43dd5802-d810-4d7c-8d1a-3ccb4675f4f4",
+      "name": "Middle Developer"
+    },
+    {
+      "id": "58f5bf47-2766-40dd-b878-9e8635e9b2ee",
+      "name": "Junior Developer"
+    }
+  ]
+}

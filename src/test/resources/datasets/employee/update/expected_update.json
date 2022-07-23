@@ -1,0 +1,39 @@
+{
+  "employee": [
+    {
+      "id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+      "first_name": "Владислав",
+      "last_name": "Кузьмин",
+      "description": "",
+      "post_id": "ebc19c4f-5bd8-4165-813f-2ac699134ad4",
+      "phone": "+79247521123",
+      "email": "personalEmail@gmail.com",
+      "work_email": "workingEmail@ya.ru",
+      "job_type": "PART_TIME"
+    }
+  ],
+  "employee_characteristics": [
+    {
+      "employee_id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+      "characteristics": "extrovert"
+    },
+    {
+      "employee_id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+      "characteristics": "like criticism"
+    },
+    {
+      "employee_id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+      "characteristics": "love of learning"
+    },
+    {
+      "employee_id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+      "characteristics": "pragmatism"
+    }
+  ],
+  "post": [
+    {
+      "id": "ebc19c4f-5bd8-4165-813f-2ac699134ad4",
+      "name": "Senior Developer"
+    }
+  ]
+}
