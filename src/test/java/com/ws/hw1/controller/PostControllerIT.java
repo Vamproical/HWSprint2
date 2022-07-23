@@ -33,7 +33,6 @@ class PostControllerIT {
     @ExpectedDataSet(value = "datasets/post/create/expected_create.json")
     void create() {
         //Arrange
-        UUID id = UUID.randomUUID();
         CreatePostDto createDto = new CreatePostDto("Lead Developer");
 
         //Act
@@ -49,7 +48,7 @@ class PostControllerIT {
                                       .returnResult()
                                       .getResponseBody();
 
-        PostDto expected = new PostDto(id, "Lead Developer");
+        PostDto expected = new PostDto(UUID.randomUUID(), "Lead Developer");
 
         Assertions.assertNotNull(actual.getId());
         assertThat(actual).usingRecursiveComparison()
@@ -80,32 +79,6 @@ class PostControllerIT {
     }
 
     @Test
-    @DataSet(cleanBefore = true, cleanAfter = true, value = "datasets/post/get/get.json")
-    void tryGetAndGetNotFound() {
-        //Arrange
-        UUID id = UUID.randomUUID();
-        ErrorDto expected = ErrorDto.builder()
-                                    .timestamp(LocalDateTime.now())
-                                    .message("The post not found")
-                                    .build();
-
-        //Act
-        ErrorDto actual = webTestClient.get()
-                                       .uri("post/{id}", id)
-                                       .exchange()
-                                       //Assert
-                                       .expectStatus()
-                                       .isNotFound()
-                                       .expectBody(ErrorDto.class)
-                                       .returnResult()
-                                       .getResponseBody();
-
-        assertThat(actual).usingRecursiveComparison()
-                          .ignoringFields("timestamp")
-                          .isEqualTo(expected);
-    }
-
-    @Test
     @DataSet(cleanBefore = true, cleanAfter = true, value = "datasets/post/update/update.json")
     @ExpectedDataSet(value = "datasets/post/update/expected_update.json")
     void update() {
@@ -130,33 +103,6 @@ class PostControllerIT {
     }
 
     @Test
-    @DataSet(cleanBefore = true, cleanAfter = true, value = "datasets/post/update/update.json")
-    void tryUpdateAndGetNotFound() {
-        //Arrange
-        UUID id = UUID.randomUUID();
-        ErrorDto actual = ErrorDto.builder()
-                                  .timestamp(LocalDateTime.now())
-                                  .message("The post not found")
-                                  .build();
-
-        //Act
-        ErrorDto expected = webTestClient.put()
-                                         .uri("post/{id}/update", id)
-                                         .bodyValue(updateDto)
-                                         .exchange()
-                                         //Assert
-                                         .expectStatus()
-                                         .isNotFound()
-                                         .expectBody(ErrorDto.class)
-                                         .returnResult()
-                                         .getResponseBody();
-
-        assertThat(expected).usingRecursiveComparison()
-                            .ignoringFields("timestamp")
-                            .isEqualTo(actual);
-    }
-
-    @Test
     @DataSet(cleanBefore = true, cleanAfter = true, value = "datasets/post/delete/delete.json")
     @ExpectedDataSet(value = "datasets/post/delete/expected_delete.json")
     void delete() {
@@ -170,32 +116,5 @@ class PostControllerIT {
                      //Assert
                      .expectStatus()
                      .isOk();
-    }
-
-    @Test
-    @DataSet(cleanBefore = true, cleanAfter = true, value = "datasets/post/delete/delete.json")
-    @ExpectedDataSet(value = "datasets/post/delete/delete.json")
-    void deleteAndGetNotFound() {
-        //Arrange
-        UUID id = UUID.randomUUID();
-        ErrorDto actual = ErrorDto.builder()
-                                  .timestamp(LocalDateTime.now())
-                                  .message("The post not found")
-                                  .build();
-
-        //Act
-        ErrorDto expected = webTestClient.delete()
-                                         .uri("post/{id}/delete", id)
-                                         .exchange()
-                                         //Assert
-                                         .expectStatus()
-                                         .isNotFound()
-                                         .expectBody(ErrorDto.class)
-                                         .returnResult()
-                                         .getResponseBody();
-
-        assertThat(expected).usingRecursiveComparison()
-                            .ignoringFields("timestamp")
-                            .isEqualTo(actual);
     }
 }
