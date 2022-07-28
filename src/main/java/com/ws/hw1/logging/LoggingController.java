@@ -1,6 +1,5 @@
 package com.ws.hw1.logging;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -26,7 +25,7 @@ import java.util.Arrays;
 @ConditionalOnProperty(prefix = "log", name = "controller")
 public class LoggingController {
 
-    @Pointcut("within(com.ws.hw1.controller.employee.EmployeeController) || within(com.ws.hw1.controller.post.PostController)")
+    @Pointcut("within(com.ws.hw1.controller.*.*Controller)")
     public void controllerPointCut() {
     }
 
@@ -53,33 +52,41 @@ public class LoggingController {
     }
 
     private void saveLog(ProceedingJoinPoint joinPoint) {
+        StringBuilder logger = new StringBuilder();
+
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
 
-        logMethodName(joinPoint, signature);
-        logParams(joinPoint, method);
+        logger.append(logMethodName(joinPoint, signature));
+        logger.append(logParams(joinPoint, method));
 
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 
-        logServletRequest(request);
+        logger.append(logServletRequest(request));
+
+        log.info(logger.toString());
     }
 
-    private void logMethodName(ProceedingJoinPoint joinPoint, MethodSignature signature) {
-
-
+    private StringBuilder logMethodName(ProceedingJoinPoint joinPoint, MethodSignature signature) {
         String className = joinPoint.getTarget().getClass().getName();
         String methodName = signature.getName();
 
-        log.info("method= " + className + "." + methodName + "()");
+        return new StringBuilder()
+                .append("method= ")
+                .append(className)
+                .append(".")
+                .append(methodName)
+                .append("()");
 
     }
 
-    private void logParams(ProceedingJoinPoint joinPoint, Method method) {
+    private StringBuilder logParams(ProceedingJoinPoint joinPoint, Method method) {
         Object[] args = joinPoint.getArgs();
         LocalVariableTableParameterNameDiscoverer nameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
         String[] paramNames = nameDiscoverer.getParameterNames(method);
 
         StringBuilder params = new StringBuilder();
+        params.append("params=");
 
         if (args != null && paramNames != null) {
             for (int i = 0; i < args.length; i++) {
@@ -90,13 +97,18 @@ public class LoggingController {
             }
         }
 
-        log.info("params=" + params);
+        return params;
     }
 
-    private void logServletRequest(HttpServletRequest request) {
-        log.info("ipAddress= " + request.getRemoteAddr());
-        log.info("endpoint= " + request.getServletPath());
-        log.info("requestTime= " + LocalDateTime.now());
-        log.info("operation= " + request.getMethod());
+    private StringBuilder logServletRequest(HttpServletRequest request) {
+        return new StringBuilder()
+                .append("ipAddress= ")
+                .append(request.getRemoteAddr())
+                .append("endpoint= ")
+                .append(request.getServletPath())
+                .append("requestTime= ")
+                .append(LocalDateTime.now())
+                .append("operation= ")
+                .append(request.getMethod());
     }
 }

@@ -1,6 +1,9 @@
 package com.ws.hw1.service.employee;
 
-import com.querydsl.jpa.impl.JPAQuery;
+import com.google.common.collect.Lists;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
 import com.ws.hw1.action.CreateJpaQueryAction;
 import com.ws.hw1.exceptionhandler.exception.NotFoundException;
 import com.ws.hw1.model.Employee;
@@ -11,6 +14,7 @@ import com.ws.hw1.service.argument.UpdateEmployeeArgument;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -39,7 +43,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Employee update(@NonNull UUID id, @NonNull UpdateEmployeeArgument employeeArgument) {
         Employee employee = getExisting(id);
 
@@ -71,29 +75,29 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     @Transactional(readOnly = true)
     public List<Employee> getAll(@NonNull SearchParams params) {
-        JPAQuery<Employee> query = jpaQueryAction.execute();
         QEmployee employee = QEmployee.employee;
 
-        query.select(employee).from(employee);
+        Predicate filter = filter(params, employee);
 
-        filter(params, query, employee);
-
-        return query.orderBy(employee.lastName.asc(),
-                             employee.firstName.asc())
-                    .fetch();
+        return Lists.newArrayList(repository.findAll(filter,
+                                                     employee.lastName.asc(),
+                                                     employee.firstName.asc()));
     }
 
-    private void filter(SearchParams params, JPAQuery<Employee> query, QEmployee employee) {
-        if (params.getName() != null && !params.getName().isEmpty()) {
-            query.where(
-                    employee.firstName.containsIgnoreCase(params.getName()).or(
-                            employee.lastName.containsIgnoreCase(params.getName()))
-                       );
+    private Predicate filter(SearchParams params, QEmployee employee) {
+        BooleanBuilder booleanBuilder = new BooleanBuilder();
+
+        if (params.getName() != null) {
+            booleanBuilder.and(employee.firstName
+                                       .containsIgnoreCase(params.getName())
+                                       .or(employee.lastName
+                                                   .containsIgnoreCase(params.getName())));
         }
         if (params.getPostId() != null) {
-            query.where(
-                    employee.post.id.eq(params.getPostId())
-                       );
+            booleanBuilder.and(employee.post
+                                       .id
+                                       .eq(params.getPostId()));
         }
+        return ExpressionUtils.allOf(booleanBuilder);
     }
 }
