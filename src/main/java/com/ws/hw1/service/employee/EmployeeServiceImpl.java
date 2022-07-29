@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
-import com.ws.hw1.action.CreateJpaQueryAction;
 import com.ws.hw1.exceptionhandler.exception.NotFoundException;
 import com.ws.hw1.model.Employee;
 import com.ws.hw1.model.QEmployee;
@@ -13,6 +12,7 @@ import com.ws.hw1.service.argument.CreateEmployeeArgument;
 import com.ws.hw1.service.argument.UpdateEmployeeArgument;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository repository;
-    private final CreateJpaQueryAction jpaQueryAction;
+    private static final QEmployee qEmployee = QEmployee.employee;
 
 
     @Override
@@ -74,27 +74,23 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Employee> getAll(@NonNull SearchParams params) {
-        QEmployee employee = QEmployee.employee;
+    public List<Employee> getAll(@NonNull SearchParams params, Sort sort) {
+        Predicate filter = filter(params);
 
-        Predicate filter = filter(params, employee);
-
-        return Lists.newArrayList(repository.findAll(filter,
-                                                     employee.lastName.asc(),
-                                                     employee.firstName.asc()));
+        return Lists.newArrayList(repository.findAll(filter, sort));
     }
 
-    private Predicate filter(SearchParams params, QEmployee employee) {
+    private Predicate filter(SearchParams params) {
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
         if (params.getName() != null) {
-            booleanBuilder.and(employee.firstName
+            booleanBuilder.and(qEmployee.firstName
                                        .containsIgnoreCase(params.getName())
-                                       .or(employee.lastName
+                                       .or(qEmployee.lastName
                                                    .containsIgnoreCase(params.getName())));
         }
         if (params.getPostId() != null) {
-            booleanBuilder.and(employee.post
+            booleanBuilder.and(qEmployee.post
                                        .id
                                        .eq(params.getPostId()));
         }

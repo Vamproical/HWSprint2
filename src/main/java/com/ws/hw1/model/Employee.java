@@ -43,14 +43,7 @@ public class Employee {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Employee employee = (Employee) o;
-        return id.equals(employee.id)
-               && firstName.equals(employee.firstName)
-               && lastName.equals(employee.lastName)
-               && Objects.equals(description, employee.description)
-               && characteristics.equals(employee.characteristics)
-               && post.equals(employee.post)
-               && contacts.equals(employee.contacts)
-               && jobType == employee.jobType;
+        return id != null && id.equals(employee.id);
     }
 
     @Override
