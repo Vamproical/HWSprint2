@@ -1,0 +1,43 @@
+{
+  "employee": [
+    {
+      "id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+      "first_name": "Геннадий",
+      "last_name": "Кузьмин",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit \namet dictum felis, eu fringilla eros. Sed et gravida neque. Nullam at egestas \nerat. Mauris vitae convallis nulla. Aenean condimentum lectus magna. \nSuspendisse viverra quam non ante pellentesque, a euismod nunc dapibus. Duis \nsed congue erat",
+      "post_id": "ebc19c4f-5bd8-4165-813f-2ac699134ad4",
+      "phone": "+79247521321",
+      "email": "personalEmail@gmail.com",
+      "work_email": "workEmail@ya.ru",
+      "job_type": "FULL_TIME"
+    }
+  ],
+  "employee_characteristics": [
+    {
+      "employee_id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+      "characteristics": "honest"
+    },
+    {
+      "employee_id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+      "characteristics": "introvert"
+    },
+    {
+      "employee_id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+      "characteristics": "like criticism"
+    },
+    {
+      "employee_id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+      "characteristics": "love of learning"
+    },
+    {
+      "employee_id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+      "characteristics": "pragmatism"
+    }
+  ],
+  "post": [
+    {
+      "id": "ebc19c4f-5bd8-4165-813f-2ac699134ad4",
+      "name": "Senior Developer"
+    }
+  ]
+}

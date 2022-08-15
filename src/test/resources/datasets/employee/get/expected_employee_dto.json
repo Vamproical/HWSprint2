@@ -1,0 +1,23 @@
+{
+  "id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+  "firstName": "Геннадий",
+  "lastName": "Кузьмин",
+  "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit \namet dictum felis, eu fringilla eros. Sed et gravida neque. Nullam at egestas \nerat. Mauris vitae convallis nulla. Aenean condimentum lectus magna. \nSuspendisse viverra quam non ante pellentesque, a euismod nunc dapibus. Duis \nsed congue erat",
+  "characteristics": [
+    "honest",
+    "introvert",
+    "like criticism",
+    "love of learning",
+    "pragmatism"
+  ],
+  "post": {
+    "id": "ebc19c4f-5bd8-4165-813f-2ac699134ad4",
+    "name": "Senior Developer"
+  },
+  "contacts": {
+    "phone": "+79247521321",
+    "email": "personalEmail@gmail.com",
+    "workEmail": "workEmail@ya.ru"
+  },
+  "jobType": "FULL_TIME"
+}

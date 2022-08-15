@@ -1,55 +1,53 @@
 package com.ws.hw1.service.post;
 
 import com.ws.hw1.controller.post.dto.UpdatePostDto;
+import com.ws.hw1.exceptionhandler.exception.NotFoundException;
 import com.ws.hw1.model.Post;
+import com.ws.hw1.repository.PostRepository;
 import com.ws.hw1.service.argument.CreatePostArgument;
-import com.ws.hw1.utils.Guard;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
-    private final Map<UUID, Post> posts = new HashMap<>();
+    private final PostRepository postRepository;
 
     @Override
     public Post getExisting(@NonNull UUID id) {
-        Guard.check(posts.containsKey(id), "The post not found");
-        return posts.get(id);
+        return postRepository.findById(id).orElseThrow(() -> new NotFoundException("The post not found"));
     }
 
     @Override
     public Post create(@NonNull CreatePostArgument argumentPost) {
-        UUID id = UUID.randomUUID();
         Post post = Post.builder()
-                        .id(id)
-                        .name(argumentPost.getName()).build();
+                        .name(argumentPost.getName())
+                        .build();
 
-        posts.put(id, post);
-
-        return post;
+        return postRepository.save(post);
     }
 
     @Override
     public Post update(@NonNull UUID id, @NonNull UpdatePostDto argumentPost) {
-        Guard.check(posts.containsKey(id), "The post not found");
-
         Post post = getExisting(id);
         post.setName(argumentPost.getName());
 
-        return post;
+        return postRepository.save(post);
     }
 
     @Override
     public void delete(@NonNull UUID id) {
-        Guard.check(posts.containsKey(id), "The post not found");
-        posts.remove(id);
+        getExisting(id);
+        postRepository.deleteById(id);
     }
 
     @Override
     public List<Post> getAll() {
-        return new ArrayList<>(posts.values());
+        return postRepository.findAll();
     }
 
 }

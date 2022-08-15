@@ -1,0 +1,22 @@
+{
+  "id": "e5320e1e-e628-4e08-8389-32e1b28b2acd",
+  "firstName": "Владислав",
+  "lastName": "Кузьмин",
+  "description": "",
+  "characteristics": [
+    "extrovert",
+    "like criticism",
+    "love of learning",
+    "pragmatism"
+  ],
+  "post": {
+    "id": "ebc19c4f-5bd8-4165-813f-2ac699134ad4",
+    "name": "Senior Developer"
+  },
+  "contacts": {
+    "phone": "+79247521123",
+    "email": "personalEmail@gmail.com",
+    "workEmail": "workingEmail@ya.ru"
+  },
+  "jobType": "PART_TIME"
+}

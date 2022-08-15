@@ -1,9 +1,9 @@
 package com.ws.hw1.controller.employee.dto;
 
 import com.ws.hw1.model.JobType;
-import lombok.Builder;
 import lombok.Data;
-import lombok.extern.jackson.Jacksonized;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
-@Builder
-@Jacksonized
+@SuperBuilder
+@NoArgsConstructor
 public class UpdateEmployeeDto {
     @NotBlank
     private String firstName;

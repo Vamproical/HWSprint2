@@ -14,6 +14,8 @@ import com.ws.hw1.service.argument.UpdateEmployeeArgument;
 import com.ws.hw1.service.employee.EmployeeService;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +36,7 @@ public class EmployeeController {
     @ApiOperation("Добавить нового сотрудника")
     @PostMapping("create")
     @ResponseStatus(code = HttpStatus.CREATED)
-    public EmployeeDto createEmployee(@RequestBody @Valid CreateEmployeeDto employeeDto) {
+    public EmployeeDto create(@RequestBody @Valid CreateEmployeeDto employeeDto) {
         CreateEmployeeArgument employeeArgument = createEmployeeArgumentAction.execute(employeeDto);
         Employee newEmployee = employeeService.create(employeeArgument);
         return employeeMapper.toDTO(newEmployee);
@@ -42,7 +44,7 @@ public class EmployeeController {
 
     @ApiOperation("Обновить характеристики сотрудника")
     @PutMapping("{id}/update")
-    public EmployeeDto updateEmployee(@PathVariable UUID id, @RequestBody @Valid UpdateEmployeeDto employeeDto) throws NotFoundException {
+    public EmployeeDto update(@PathVariable UUID id, @RequestBody @Valid UpdateEmployeeDto employeeDto) throws NotFoundException {
         UpdateEmployeeArgument employeeArgument = updateEmployeeArgumentAction.execute(employeeDto);
         Employee updatedPost = employeeService.update(id, employeeArgument);
         return employeeMapper.toDTO(updatedPost);
@@ -50,7 +52,7 @@ public class EmployeeController {
 
     @ApiOperation("Удалить сотрудника")
     @DeleteMapping("{id}/delete")
-    public void deleteEmployee(@PathVariable UUID id) throws NotFoundException {
+    public void delete(@PathVariable UUID id) throws NotFoundException {
         employeeService.delete(id);
     }
 
@@ -62,8 +64,12 @@ public class EmployeeController {
 
     @ApiOperation("Получить список сотрудников")
     @GetMapping("list")
-    public List<EmployeeDto> getAll(SearchParamsDto searchParamsDto) {
-        return employeeService.getAll(employeeMapper.toParams(searchParamsDto))
+    public List<EmployeeDto> getAll(SearchParamsDto searchParamsDto,
+                                    @SortDefault.SortDefaults({
+                                            @SortDefault(sort = "lastName", direction = Sort.Direction.ASC),
+                                            @SortDefault(sort = "firstName", direction = Sort.Direction.DESC)
+                                    }) Sort sort) {
+        return employeeService.getAll(employeeMapper.toParams(searchParamsDto), sort)
                               .stream()
                               .map(employeeMapper::toDTO)
                               .collect(Collectors.toList());

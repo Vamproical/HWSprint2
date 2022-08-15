@@ -28,7 +28,7 @@ public class PostController {
     @ApiOperation("Добавить должность")
     @PostMapping("create")
     @ResponseStatus(code = HttpStatus.CREATED)
-    public PostDto addNewPost(@RequestBody @Valid CreatePostDto postDto) {
+    public PostDto create(@RequestBody @Valid CreatePostDto postDto) {
         CreatePostArgument postArgument = CreatePostArgument.builder()
                                                             .name(postDto.getName())
                                                             .build();
@@ -38,14 +38,14 @@ public class PostController {
 
     @ApiOperation("Обновить должность")
     @PutMapping("{id}/update")
-    public PostDto updatePost(@PathVariable UUID id, @RequestBody @Valid UpdatePostDto postDto) throws NotFoundException {
+    public PostDto update(@PathVariable UUID id, @RequestBody @Valid UpdatePostDto postDto) throws NotFoundException {
         Post updatedPost = postService.update(id, postDto);
         return postMapper.toDTO(updatedPost);
     }
 
     @ApiOperation("Удалить должность")
     @DeleteMapping("{id}/delete")
-    public void deletePost(@PathVariable UUID id) throws NotFoundException {
+    public void delete(@PathVariable UUID id) throws NotFoundException {
         postService.delete(id);
     }
 
